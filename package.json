@@ -6,7 +6,7 @@
     "build": "./node_modules/.bin/webpack --config webpack.config.js --mode production --env.production",
     "start": "./node_modules/.bin/webpack-dev-server --open --mode development --env.development",
     "test": "jest"
-   },
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -34,7 +34,7 @@
       "@babel/preset-react"
     ]
   },
-  "jest" : {
+  "jest": {
     "moduleNameMapper": {
       "^.+\\.(css|scss)$": "<rootDir>/jest/staticHandler.js"
     }
