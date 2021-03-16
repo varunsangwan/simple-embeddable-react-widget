@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+    search,
     fetchItem,
     ElasticSearch,
   } from "../../config";
@@ -16,9 +17,12 @@ class Widget extends React.Component {
         };
     }
     
-      
+    async fetchItem(){
+        const res = await fetch(url, requestParamsNoAuth("POST", body));
+        return;
+    }
     componentDidUpdate(){
-        this.fetchItem(this.state.formData);
+        //this.fetchItem(this.state.formData);
     }
       
     render() {

@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Widget from './components/Widget/Widget';
-import Config from './config';
 
-const widgetName = Config.name;
+
+const widgetName = "Mintable_Widget";
 const widgetConfigName = widgetName + 'Config'
 const defaultconfig = {
     someDefaultConfiguration: false
@@ -81,6 +81,8 @@ function apiHandler(api, params) {
             // Send the message to the current widget instance
             widgetComponent.current.setMessage(params);
             break;
+        case 'shownft':
+            widgetComponent.current.setFormData(params);
         default:
             throw Error(`Method ${api} is not supported`);
     }

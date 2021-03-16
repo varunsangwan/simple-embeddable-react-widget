@@ -16,11 +16,21 @@
     <div id="root">Loading...</div>
     <script>
         (function (w, d, s, o, f, js, fjs) {
-            w['Simple-Widget'] = o; w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
+            w['Mintable_Widget'] = o; w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
             js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
             js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
         }(window, document, 'script', 'w1', './widget.js'));
-        w1('init', { targetElementId: 'root' });
+        w1('init', { targetElementId: 'root'});
+      w1('shownft', { size: 10,
+        lastKey: "",
+        searchTerm: "",
+        category: "_all",
+        type: "listing",
+        priceFilter: "",
+        auction: false,
+        resellable: false,
+      copyright: false,
+      priceSort: ""});
 
     </script>
 

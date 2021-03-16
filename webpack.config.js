@@ -7,7 +7,7 @@ module.exports = (env) => {
     const isProductionBuild = env && env.production;
 
     return [{
-        entry: './src/main.js',
+        entry: {polyfill: 'babel-polyfill', app:'./src/main.js',},
         mode: 'production',
         output: {
             filename: 'widget.js',
