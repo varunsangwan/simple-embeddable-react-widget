@@ -16,13 +16,41 @@ class Widget extends React.Component {
             formData:null,
         };
     }
-    
-    async fetchItem(){
-        const res = await fetch(url, requestParamsNoAuth("POST", body));
-        return;
+    requestParamsNoAuth(method, body){
+        let params = {
+          method: method,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        };
+      
+        if (body) {
+          params["body"] = JSON.stringify(body);
+        }
+      
+        params["mode"] = "cors";
+        return params;
+      };
+    async fetchItem(url, body){
+        const res =  await fetch(url, this.requestParamsNoAuth("POST", body));
+        if (res.status === 401) {
+            //localStorage.removeItem(AUTHENTICATION_TOKEN);
+            console.log("404")
+          }
+          if (res.status >= 200 && res.status < 400) {
+              console.log(res.json())
+            return res.json();
+          } else {
+            const response = await res.json();
+        
+            throw Error(response.reason);
+          }
+       
     }
     componentDidUpdate(){
-        //this.fetchItem(this.state.formData);
+        
+        this.fetchItem(url, formData);
     }
       
     render() {
@@ -33,7 +61,7 @@ class Widget extends React.Component {
             return <div className="widget-container"><h1>I'm a {widgetName}</h1></div>;
         }
     }
-    setFormData(data){
+    showUserNFT(data){
         this.setState({formData:data});
     }
     setMessage(message){

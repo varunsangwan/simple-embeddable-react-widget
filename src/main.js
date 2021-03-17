@@ -81,7 +81,7 @@ function apiHandler(api, params) {
             // Send the message to the current widget instance
             widgetComponent.current.setMessage(params);
             break;
-        case 'shownft':
+        case 'showUserNFT':
             widgetComponent.current.setFormData(params);
         default:
             throw Error(`Method ${api} is not supported`);
