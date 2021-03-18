@@ -34,8 +34,9 @@ class Widget extends React.Component {
           lastKey: undefined,
           sub: undefined,
           store_id: undefined}
-        this.setState({formData: data});
-        fetchByUsername(data);
+        let arr = fetchByUsername(data);
+        console.log(arr);
+
     }
     setMessage(message){
         this.setState({message: message});
