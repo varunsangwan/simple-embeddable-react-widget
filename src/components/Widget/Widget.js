@@ -1,9 +1,8 @@
 import React from 'react'
 
-import './widget.css';
 import {fetchByUsername} from "../../fetchItemUsername/fetchItemUsername";
 import {fetchById} from "../../fetchItemId/fetchItemId";
-import styles from './Widget.css';
+
  
 const widgetName = 'Mintable_Widget';
 
