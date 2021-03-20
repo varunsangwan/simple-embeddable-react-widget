@@ -84,6 +84,9 @@ function apiHandler(api, params) {
         case 'showusernft':
             widgetComponent.current.showUserNFT(params);
             break;
+        case 'shownftid':
+            widgetComponent.current.showId(params);
+            break;
         default:
             throw Error(`Method ${api} is not supported`);
     }

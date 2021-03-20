@@ -27,7 +27,9 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "babel-polyfill": "^6.26.0",
+    "bootstrap": "^4.6.0",
     "react": "^16.10.2",
+    "react-bootstrap": "^1.5.2",
     "react-dom": "^16.10.2"
   },
   "babel": {

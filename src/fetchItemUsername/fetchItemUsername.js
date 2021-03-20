@@ -56,7 +56,7 @@ function requestParamsNoAuth(method, body) {
       
         var resp = await getRequestWithoutAuth(
         fetchCurrentItem + "?" + query + `&network=${network}`)
-      
+      return resp;
       
     } catch (err) {
       console.log(err);
