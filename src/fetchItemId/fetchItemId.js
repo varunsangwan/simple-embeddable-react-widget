@@ -30,7 +30,7 @@ async function getRequestWithoutAuth(url) {
 
 export const fetchES = async function fetchESReq(id) {
   try {
-    const response = getRequestWithoutAuth(ESSearch + id);
+    const response = await fetch(ESSearch + id); //getRequestWithoutAuth(ESSearch + id);
 
     return response;
   } catch (err) {
