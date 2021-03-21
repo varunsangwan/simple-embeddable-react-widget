@@ -60,7 +60,10 @@ class Widget extends React.Component {
   fontSize: '0.7em',
   lineHeight: '1.6em',
   marginRight: '25px',
-  textAlign: 'justify',}}>{this.state.widgetData.get(img[0]).description}</p>
+  textAlign: 'justify',
+  overflow: 'hidden',
+  maxWidth: '75ch',
+  maxHeight:'18ch'}}>{this.state.widgetData.get(img[0]).description}...</p>
           <div>
             <a href={this.state.link}><button style={{background: '#e0c9cb',
             width: '67%',
