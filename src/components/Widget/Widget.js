@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./widget.module.css";
 import { fetchByUsername } from "../../fetchItemUsername/fetchItemUsername";
-import { fetchById } from "../../fetchItemId/fetchItemId";
+import { fetchES } from "../../fetchItemId/fetchItemId";
 
 const widgetName = "Mintable_Widget";
 
@@ -134,7 +134,7 @@ class Widget extends React.Component {
     return SEO.replace(/[^a-zA-Z0-9-_]/g, "");
   }
   async showId(id) {
-    let element = await fetchById(id.id);
+    let element = await fetchES(id.id);
     console.log(element);
     let map = new Map();
     element.description = element.description.replace(/<\/?p[^>]*>/g, "");

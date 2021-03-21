@@ -6,6 +6,7 @@ export const CORS_PROXY =
   "https://g1s14sw900.execute-api.us-east-1.amazonaws.com/prod/cors-proxy/?url=";
 export const search = `${API_HOST1}/search`;
 
+export const ESSearch = `https://search-mintable-eth-search-dny3k7asv3l7blchtresn3k6se.us-east-1.es.amazonaws.com/`;
 export const fetchCurrentItem = `${API_HOST1}/listings/byusername`;
 
 export const fetchItem = `${API_HOST1}/listings/`;
