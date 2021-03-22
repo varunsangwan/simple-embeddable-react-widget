@@ -10,3 +10,7 @@ export const ESSearch = `https://search-mintable-eth-search-dny3k7asv3l7blchtres
 export const fetchCurrentItem = `${API_HOST1}/listings/byusername`;
 
 export const fetchItem = `${API_HOST1}/listings/`;
+export const PRICE_FEED =
+  "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd";
+export const BACKUP_PRICE_FEED =
+  "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=1EKKQSZBAD4UDNKSYIZQ5M1YS1WZ8RXN99";

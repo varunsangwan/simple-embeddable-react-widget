@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./widget.module.css";
 import { fetchByUsername } from "../../fetchItemUsername/fetchItemUsername";
 import { fetchES } from "../../fetchItemId/fetchItemId";
+import {getETHPrice} from "../../utils/pricefeed";
 
 const widgetName = "Mintable_Widget";
 
@@ -15,9 +16,23 @@ class Widget extends React.Component {
       formData: null,
       listingID: null,
       widgetData: null,
+      backgroundColor:null,
+      fontFamily:"Times New Roman", 
+      ButtonColor:null,
+      boxShadow:true,
+      currrencyUnit:"ETH",
+      ETHprice:null,
     };
   }
-
+  async componentDidMount(){
+    let price = await getETHPrice();
+    this.setState({
+      ETHprice: price.usd,
+    });
+  }
+  formatMoney(n) {
+    return "$ " + (Math.round(n * 100) / 100).toLocaleString();
+  }
   render() {
     let img =
       this.state.widgetData == null
@@ -28,13 +43,14 @@ class Widget extends React.Component {
         {this.state.widgetData && (
           <div
             style={{
+              fontFamily:this.state.fontFamily==null?"sans-serif":this.state.fontFamily,
               position: "relative",
               margin: "auto",
               overflow: "hidden",
               width: "520px",
               height: "350px",
-              background: "#f5f5f5",
-              boxShadow: "5px 5px 15px #ba7e7e",
+              background: this.state.backgroundColor==null?"#f5f5f5":this.state.backgroundColor,
+              boxShadow: this.state.boxShadow==true?"5px 5px 15px #ba7e7e":"0px",
               borderRadius: "10px",
             }}
           >
@@ -76,7 +92,8 @@ class Widget extends React.Component {
                 {this.state.widgetData.get(img[0]).title}
               </h1>
               <h2 style={{ color: "#c3a1a0", marginTop: "-5px" }}>
-                {this.state.widgetData.get(img[0]).buyPrice} ETH
+                {this.state.currrencyUnit=="ETH"?this.state.widgetData.get(img[0]).buyPrice+" ETH": this.formatMoney(this.state.ETHprice*this.state.widgetData.get(img[0]).buyPrice)+" USD"}
+                
               </h2>
               <p
                 className={styles.abc}
@@ -100,7 +117,7 @@ class Widget extends React.Component {
                 <a href={this.state.link}>
                   <button
                     style={{
-                      background: "#e0c9cb",
+                      backgroundColor: this.state.ButtonColor==null?"#e0c9cb":this.state.ButtonColor,
                       width: "67%",
                       padding: "10px",
                       display: "inline-block",
@@ -133,8 +150,9 @@ class Widget extends React.Component {
     ////console.log(SEO.replace(/[^a-zA-Z0-9-_]/g, ""));
     return SEO.replace(/[^a-zA-Z0-9-_]/g, "");
   }
-  async showId(id) {
-    let element = await fetchES(id.id);
+  async showId(params) {
+    console.log(params)
+    let element = await fetchES(params.id);
     console.log(element);
     let map = new Map();
     element.description = element.description.replace(/<\/?p[^>]*>/g, "");
@@ -152,11 +170,17 @@ class Widget extends React.Component {
     let url = `https://mintable.app/${element.category}/item/${SEO}/${element.id}`;
     let user = `https://mintable.app/u/${element.owner}`;
     console.log(url);
+    
     this.setState({
       link: url,
       userProfile: user,
-      listingID: id,
+      listingID: params.id,
       widgetData: map,
+      backgroundColor:params.backgroundColor,
+      fontFamily:params.fontFamily, 
+      ButtonColor:params.ButtonColor,
+      boxShadow:params.boxShadow, 
+      currrencyUnit:params.currrencyUnit,
     });
     console.log(map);
   }
