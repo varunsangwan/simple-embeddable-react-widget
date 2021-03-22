@@ -30,9 +30,13 @@ async function getRequestWithoutAuth(url) {
 
 export const fetchES = async function fetchESReq(id) {
   try {
-    const response = await fetch(ESSearch + id); //getRequestWithoutAuth(ESSearch + id);
-
-    return response;
+    let fetchResult = null;
+    const response = await fetch(ESSearch + id)
+    .then(response => response.json())
+    .then(data => fetchResult=data );
+    console.log(fetchResult)
+    return fetchResult._source.data;
+    
   } catch (err) {
     console.log(err);
   }

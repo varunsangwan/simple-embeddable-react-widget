@@ -151,7 +151,7 @@ class Widget extends React.Component {
     let SEO = this.getSEOstring(element.title, element.sub_title);
     let url = `https://mintable.app/${element.category}/item/${SEO}/${element.id}`;
     let user = `https://mintable.app/u/${element.owner}`;
-    console.log(user);
+    console.log(url);
     this.setState({
       link: url,
       userProfile: user,
