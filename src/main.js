@@ -10,7 +10,7 @@ const defaultconfig = {
 let widgetComponent = null;
 
 function app(window) {
-  console.log(`${widgetName} starting`);
+  // console.log(`${widgetName} starting`);
   // If we don't already have a name for widget's global object
   // assigned by the host, then they must be using the simple <script> tag method
   // so we need to get our data out of that tag
@@ -23,7 +23,7 @@ function app(window) {
 
     let rawData = tag.getAttribute("data-config");
     rawData = rawData.replace(/'/g, '"');
-    console.log(rawData);
+    // console.log(rawData);
     let data = JSON.parse(rawData);
 
     window[widgetName] = data.name;
@@ -42,11 +42,11 @@ function app(window) {
   window[widgetConfigName] = defaultconfig;
 
   if (placeholder) {
-    console.log(`${widgetName} placeholder found`);
+    // console.log(`${widgetName} placeholder found`);
 
     let queue = placeholder.q;
     if (queue) {
-      console.log(`${widgetName} placeholder queue found`);
+      // console.log(`${widgetName} placeholder queue found`);
 
       for (var i = 0; i < queue.length; i++) {
         apiHandler(queue[i][0], queue[i][1]);
@@ -63,11 +63,11 @@ function apiHandler(api, params) {
   api = api.toLowerCase();
   let config = window[widgetConfigName];
 
-  console.log(`Handling API call ${api}`, params, config);
+  // console.log(`Handling API call ${api}`, params, config);
 
   switch (api) {
     case "init":
-      console.log("init");
+      // console.log("init");
       config = Object.assign({}, config, params);
       window[widgetConfigName] = config;
 
@@ -79,15 +79,11 @@ function apiHandler(api, params) {
         document.getElementById(config.targetElementId)
       );
       break;
-    case "message":
-      // Send the message to the current widget instance
-      widgetComponent.current.setMessage(params);
-      break;
-    case "showusernft":
+    case "shownftusername":
       widgetComponent.current.showUserNFT(params);
       break;
     case "shownftid":
-      widgetComponent.current.showId(params);
+      widgetComponent.current.showWithNftId(params);
       break;
     default:
       throw Error(`Method ${api} is not supported`);

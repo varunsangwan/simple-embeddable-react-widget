@@ -1,0 +1,12 @@
+.container {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+}
+
+.iconContainer {
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  margin-right: 8px;
+}

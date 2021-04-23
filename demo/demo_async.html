@@ -4,15 +4,13 @@
   </head>
 
   <body>
-    <h1>Lorem ipsum dolor sit amet augue</h1>
-    <h2>Fusce gravida vehicula vestibulum tortor pulvinar</h2>
-    <p>
+    <!-- <p>
       Orci purus ante excepteur nunc nascetur rhoncus taciti ut. Ornare vitae
       sed. Amet suspendisse integer rutrum aliquet venenatis. Nec sed nullam
       mauris magna vel pretium non tristique. Porta justo ac dictumst aliquip
       blandit. Libero nec eu dolor eget volutpat. Magna nulla neque. Fames
       tempus lorem duis orci ipsum.
-    </p>
+    </p> -->
 
     <div id="root">Loading...</div>
     <script>
@@ -30,11 +28,37 @@
         fjs.parentNode.insertBefore(js, fjs);
       })(window, document, "script", "w1", "./widget.js");
       w1("init", { targetElementId: "root" });
-      w1("shownftid", { id: "art/listing/BpF4-pwkcxjB3Xz" , backgroundColor:"black", fontFamily:"Times New Roman", ButtonColor:"blue",boxShadow:true, currrencyUnit:"USDs",});
+
+      // w1("shownftid", {
+      //   type: "nftId",
+      //   id: "art/listing/QiEO1tXP-sKDtFH",
+
+      //   backgroundColor: "white",
+      //   fontColor: "#2d2d2d",
+      //   subtitleFontColor: "#727272",
+      //   boxShadow: true,
+      //   fontFamily: "Lato",
+      //   buttonColor: "#550ded",
+      //   buttonTextColor: "white",
+      // });
+
+      w1("shownftusername", {
+        type: "username",
+        username: "art8art",
+        itemCount: "8",
+
+        backgroundColor: "white",
+        fontColor: "#2d2d2d",
+        subtitleFontColor: "##727272",
+        boxShadow: true,
+        fontFamily: "Lato",
+        // buttonColor: "#550ded",
+        // buttonTextColor: "white",
+      });
     </script>
 
-    <div>
+    <!-- <div>
       <button onclick="w1('message', 'Hello world!');">Send Message</button>
-    </div>
+    </div> -->
   </body>
 </html>

@@ -34,6 +34,7 @@ module.exports = (env) => {
               },
             ],
           },
+          { test: /\.png$/, use: "url-loader?mimetype=image/png" },
         ],
       },
       devServer: {
