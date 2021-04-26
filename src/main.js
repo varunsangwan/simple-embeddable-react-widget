@@ -79,11 +79,8 @@ function apiHandler(api, params) {
         document.getElementById(config.targetElementId)
       );
       break;
-    case "shownftusername":
-      widgetComponent.current.showUserNFT(params);
-      break;
-    case "shownftid":
-      widgetComponent.current.showWithNftId(params);
+    case "shownft":
+      widgetComponent.current.showNft(params);
       break;
     default:
       throw Error(`Method ${api} is not supported`);

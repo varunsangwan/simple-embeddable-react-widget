@@ -1,3 +1,5 @@
+/* //TODO: use em values */
+
 .widgetContainer {
   font-family: "Lato", sans-serif;
 }
@@ -162,4 +164,34 @@
   padding-bottom: 12px;
 }
 
-/* styles for view more button */
+.viewMore {
+  text-decoration: none;
+  text-align: center;
+}
+
+.viewMore div {
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  border: 1px solid #2d2d2d;
+  color: #2d2d2d;
+  padding: 8px;
+  width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 48px;
+}
+
+.poweredBy {
+  position: absolute;
+  top: -32px;
+  right: 0;
+
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #000000;
+}

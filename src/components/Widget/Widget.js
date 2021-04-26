@@ -1,5 +1,3 @@
-//TODO check if from mintable store
-
 import React from "react";
 import { PROFILE_S3_BUCKET, userProfile } from "../../config";
 import { fetchES } from "../../fetchItemId/fetchItemId";
@@ -24,7 +22,7 @@ class Widget extends React.Component {
       buttonColor: null,
       buttonTextColor: null,
 
-      type: null,
+      type: null, // nftId, username,
       widgetData: null,
       widgetDataArr: [],
     };
@@ -40,6 +38,10 @@ class Widget extends React.Component {
     return "$ " + (Math.round(n * 100) / 100).toLocaleString();
   }
 
+  isNotFromMintableStore(storeId) {
+    return storeId !== "0000-000000000";
+  }
+
   async getProfileImgAndSocialMedia(username) {
     const profileData = await getRequestWithoutAuth(
       userProfile + "/" + username
@@ -50,8 +52,30 @@ class Widget extends React.Component {
     };
   }
 
+  showNft(params) {
+    const { ids, username, itemCount } = params;
+    // one item id
+    if (ids && ids.length === 1) {
+      this.setState({
+        type: "nftId",
+      });
+      this.showWithNftId(params);
+    }
+
+    // user name + item count
+    if (username && itemCount) {
+      this.setState({
+        type: "username",
+      });
+      this.showUserNFT(params);
+    }
+
+    // store id
+    // many item id
+  }
+
   async showWithNftId(params) {
-    const item = await fetchES(params.id);
+    const item = await fetchES(params.ids[0]);
 
     const SEO = this.getSEOstring(item.title, item.sub_title);
     const itemUrl = `https://mintable.app/${item.category}/item/${SEO}/${item.id}`;
@@ -85,7 +109,6 @@ class Widget extends React.Component {
       buttonColor: params.buttonColor,
       buttonTextColor: params.buttonTextColor,
 
-      type: params.type,
       widgetData,
     });
   }
@@ -139,7 +162,6 @@ class Widget extends React.Component {
       buttonColor: params.buttonColor,
       buttonTextColor: params.buttonTextColor,
 
-      type: params.type,
       widgetDataArr,
     });
   }
@@ -168,8 +190,6 @@ class Widget extends React.Component {
       widgetDataArr,
     } = this.state;
 
-    console.log(type);
-
     if (type === "nftId") {
       return (
         <div
@@ -180,7 +200,7 @@ class Widget extends React.Component {
           }
           className={styles.widgetContainer}
         >
-          {widgetData && (
+          {widgetData && this.isNotFromMintableStore(widgetData.storeId) && (
             <div
               style={
                 {
@@ -355,7 +375,7 @@ class Widget extends React.Component {
           }
           className={styles.widgetContainer}
         >
-          {widgetDataArr && (
+          {widgetDataArr.length !== 0 && (
             <div
               style={
                 {
@@ -395,120 +415,154 @@ class Widget extends React.Component {
               </div>
 
               <div className={styles.gridContainer}>
-                {widgetDataArr.map((item, i) => (
-                  <div
-                    style={
-                      {
-                        backgroundColor: backgroundColor,
-                      } || null
-                    }
-                    className={styles.gridItemCard}
-                    key={i}
-                  >
-                    <div
-                      style={{
-                        width: "100%",
-                        paddingBottom: "100%",
-                        position: "relative",
-                      }}
-                    >
-                      {!checkIfVideoExtension(item.image) ? (
-                        <img
-                          className={styles.gridItemcardImage}
-                          src={item.image}
-                        />
-                      ) : (
-                        <video
-                          key={item.image}
-                          className={styles.gridItemcardImage}
-                          autoPlay
-                          playsInline
-                          muted
-                          loop
-                          preload="metadata"
-                          poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
-                        >
-                          <source
-                            src={item.image}
-                            onError={(e) => {
-                              e.target.poster =
-                                "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
-                            }}
-                          />
-                        </video>
-                      )}
-                    </div>
-
-                    <div
-                      style={{
-                        margin: "16px",
-                      }}
-                    >
+                {widgetDataArr.map((item, i) => {
+                  if (this.isNotFromMintableStore(item.storeId)) {
+                    return (
                       <div
                         style={
                           {
-                            color: subtitleFontColor,
+                            backgroundColor: backgroundColor,
                           } || null
                         }
-                        className={styles.gridSubtitle}
+                        className={styles.gridItemCard}
+                        key={i}
                       >
-                        {item.category}
-                      </div>
-                      <h1
-                        style={
-                          {
-                            color: fontColor,
-                          } || null
-                        }
-                        className={styles.gridItemTitle}
-                      >
-                        {item.title}
-                      </h1>
-
-                      <div className={styles.absoluteBottomContainer}>
-                        <h2
-                          style={
-                            {
-                              color: fontColor,
-                            } || null
-                          }
-                          className={styles.itemPrice}
-                        >
-                          <strong>
-                            {item.currrencyUnit == "ETH"
-                              ? item.buyPrice + " ETH"
-                              : this.formatMoney(
-                                  this.state.ETHprice * item.buyPrice
-                                )}
-                          </strong>
-                          <span>
-                            {" "}
-                            ({`\u039E`}
-                            {!item.currrencyUnit == "ETH"
-                              ? item.buyPrice + " ETH"
-                              : this.formatMoney(
-                                  this.state.ETHprice * item.buyPrice
-                                )}
-                            )
-                          </span>
-                        </h2>
                         <div
-                          style={
-                            {
-                              color: subtitleFontColor,
-                            } || null
-                          }
-                          className={styles.gridSubtitle}
+                          style={{
+                            width: "100%",
+                            paddingBottom: "100%",
+                            position: "relative",
+                          }}
                         >
-                          {item.username}
+                          {!checkIfVideoExtension(item.image) ? (
+                            <img
+                              className={styles.gridItemcardImage}
+                              src={item.image}
+                            />
+                          ) : (
+                            <video
+                              key={item.image}
+                              className={styles.gridItemcardImage}
+                              autoPlay
+                              playsInline
+                              muted
+                              loop
+                              preload="metadata"
+                              poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
+                            >
+                              <source
+                                src={item.image}
+                                onError={(e) => {
+                                  e.target.poster =
+                                    "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
+                                }}
+                              />
+                            </video>
+                          )}
+                        </div>
+
+                        <div
+                          style={{
+                            margin: "16px",
+                          }}
+                        >
+                          <div
+                            style={
+                              {
+                                color: subtitleFontColor,
+                              } || null
+                            }
+                            className={styles.gridSubtitle}
+                          >
+                            {item.category}
+                          </div>
+                          <h1
+                            style={
+                              {
+                                color: fontColor,
+                              } || null
+                            }
+                            className={styles.gridItemTitle}
+                          >
+                            {item.title}
+                          </h1>
+
+                          <div className={styles.absoluteBottomContainer}>
+                            <h2
+                              style={
+                                {
+                                  color: fontColor,
+                                } || null
+                              }
+                              className={styles.itemPrice}
+                            >
+                              <strong>
+                                {item.currrencyUnit == "ETH"
+                                  ? item.buyPrice + " ETH"
+                                  : this.formatMoney(
+                                      this.state.ETHprice * item.buyPrice
+                                    )}
+                              </strong>
+                              <span>
+                                {" "}
+                                ({`\u039E`}
+                                {!item.currrencyUnit == "ETH"
+                                  ? item.buyPrice + " ETH"
+                                  : this.formatMoney(
+                                      this.state.ETHprice * item.buyPrice
+                                    )}
+                                )
+                              </span>
+                            </h2>
+                            <div
+                              style={
+                                {
+                                  color: subtitleFontColor,
+                                } || null
+                              }
+                              className={styles.gridSubtitle}
+                            >
+                              {item.username}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  }
+                })}
               </div>
 
-              {/* TODO: add view more */}
+              <div style={{ position: "relative" }}>
+                <div className={styles.poweredBy}>
+                  <div>Powered by Mintable</div>
+                  <img
+                    style={{
+                      backgroundColor: "#000",
+                      width: "20px",
+                      height: "20px",
+                      marginLeft: "8px",
+                    }}
+                    src="https://mintable.app/logo.svg"
+                    alt=""
+                  />
+                </div>
+
+                <a
+                  href={widgetDataArr[0].userProfileUrl}
+                  className={styles.viewMore}
+                >
+                  <div
+                    style={
+                      {
+                        color: buttonTextColor,
+                        border: `1px solid ${buttonColor}`,
+                      } || null
+                    }
+                  >
+                    View More on Mintable
+                  </div>
+                </a>
+              </div>
             </div>
           )}
         </div>

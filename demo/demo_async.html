@@ -29,9 +29,9 @@
       })(window, document, "script", "w1", "./widget.js");
       w1("init", { targetElementId: "root" });
 
-      // w1("shownftid", {
-      //   type: "nftId",
-      //   id: "art/listing/QiEO1tXP-sKDtFH",
+      // one item id
+      // w1("shownft", {
+      //   ids: ["art/listing/QiEO1tXP-sKDtFH"],
 
       //   backgroundColor: "white",
       //   fontColor: "#2d2d2d",
@@ -42,8 +42,8 @@
       //   buttonTextColor: "white",
       // });
 
-      w1("shownftusername", {
-        type: "username",
+      // user name + item count
+      w1("shownft", {
         username: "art8art",
         itemCount: "8",
 
@@ -52,9 +52,14 @@
         subtitleFontColor: "##727272",
         boxShadow: true,
         fontFamily: "Lato",
-        // buttonColor: "#550ded",
-        // buttonTextColor: "white",
+        buttonColor: "#2d2d2d",
+        buttonTextColor: "#2d2d2d",
       });
+
+      // store id
+      // many item id
+
+      // TODO
     </script>
 
     <!-- <div>
