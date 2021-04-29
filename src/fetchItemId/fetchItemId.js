@@ -1,6 +1,6 @@
-import { ESSearch, fetchItem } from "../config";
+import { ESSearch } from "../config";
 
-export const fetchES = async function fetchESReq(id) {
+export const fetchById = async (id) => {
   try {
     let fetchResult = null;
     await fetch(ESSearch + id)
@@ -12,16 +12,17 @@ export const fetchES = async function fetchESReq(id) {
     console.log(err);
   }
 };
-export const fetchById = async function fetchItemReq(id) {
-  try {
-    let network = 1;
-    // console.log(fetchItem + id + `?network=${network}`);
-    const response = getRequestWithoutAuth(
-      fetchItem + id + `?network=${network}`
-    );
 
-    return response;
-  } catch (err) {
-    console.log(err);
-  }
-};
+// export const fetchById = async function fetchItemReq(id) {
+//   try {
+//     let network = 1;
+//     // console.log(fetchItem + id + `?network=${network}`);
+//     const response = getRequestWithoutAuth(
+//       fetchItem + id + `?network=${network}`
+//     );
+
+//     return response;
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };

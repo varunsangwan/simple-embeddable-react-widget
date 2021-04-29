@@ -24,3 +24,14 @@ export async function getRequestWithoutAuth(url) {
     throw res.error;
   }
 }
+
+export const postRequestWithoutAuthReturnData = async (url, body) => {
+  const res = await fetch(url, requestParamsNoAuth("POST", body));
+
+  if (res.status >= 200 && res.status < 400) {
+    return res.json();
+  } else {
+    const response = await res.json();
+    throw Error(response.reason);
+  }
+};

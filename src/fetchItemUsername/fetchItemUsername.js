@@ -14,6 +14,7 @@ function preparePaginationQuery(data) {
 
 export const fetchByUsername = async (data) => {
   const query = preparePaginationQuery(data);
+  console.log(query);
   const network = 1;
   try {
     const res = await getRequestWithoutAuth(

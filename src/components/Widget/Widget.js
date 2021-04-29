@@ -1,7 +1,8 @@
 import React from "react";
 import { PROFILE_S3_BUCKET, userProfile } from "../../config";
-import { fetchES } from "../../fetchItemId/fetchItemId";
+import { fetchById } from "../../fetchItemId/fetchItemId";
 import { fetchByUsername } from "../../fetchItemUsername/fetchItemUsername";
+import { fetchByStoreId } from "../../fetchStoreItems/fetchStoreItems";
 import { getRequestWithoutAuth } from "../../utils/api";
 import { checkIfVideoExtension } from "../../utils/checkIfVideoExtension";
 import { getETHPrice } from "../../utils/pricefeed";
@@ -22,7 +23,7 @@ class Widget extends React.Component {
       buttonColor: null,
       buttonTextColor: null,
 
-      type: null, // nftId, username,
+      type: null, // nftId, nftIdArr, username, storeId
       widgetData: null,
       widgetDataArr: [],
     };
@@ -39,7 +40,7 @@ class Widget extends React.Component {
   }
 
   isNotFromMintableStore(storeId) {
-    return storeId !== "0000-000000000";
+    return storeId !== "000000-0000000000";
   }
 
   async getProfileImgAndSocialMedia(username) {
@@ -53,30 +54,42 @@ class Widget extends React.Component {
   }
 
   showNft(params) {
-    const { ids, username, itemCount } = params;
+    const { ids, username, storeId } = params;
     // one item id
     if (ids && ids.length === 1) {
       this.setState({
         type: "nftId",
       });
-      this.showWithNftId(params);
+      this.showWithId(params);
     }
 
-    // user name + item count
-    if (username && itemCount) {
+    // many item ids
+    if (ids && ids.length !== 1) {
+      this.setState({
+        type: "nftIdArr",
+      });
+      this.showWithIdArr(params);
+    }
+
+    // user name
+    if (username) {
       this.setState({
         type: "username",
       });
-      this.showUserNFT(params);
+      this.showWithUsernameOrStoreId(params, "username");
     }
 
     // store id
-    // many item id
+    if (storeId) {
+      this.setState({
+        type: "storeId",
+      });
+      this.showWithUsernameOrStoreId(params, "storeId");
+    }
   }
 
-  async showWithNftId(params) {
-    const item = await fetchES(params.ids[0]);
-
+  async showWithId(params) {
+    const item = await fetchById(params.ids[0]);
     const SEO = this.getSEOstring(item.title, item.sub_title);
     const itemUrl = `https://mintable.app/${item.category}/item/${SEO}/${item.id}`;
     const userProfileUrl = `https://mintable.app/u/${item.owner}`;
@@ -87,6 +100,7 @@ class Widget extends React.Component {
     const widgetData = {
       image: item.preview_images[0],
       username: item.owner,
+      storeId: item.store_id,
       buyPrice: item.buyNowPrice == 0 ? item.startingPrice : item.buyNowPrice,
       title: item.title,
       subtitle: item.subtitle,
@@ -113,14 +127,82 @@ class Widget extends React.Component {
     });
   }
 
-  async showUserNFT(params) {
-    const fetchParams = {
-      username: params.username,
-      size: params.itemCount,
-      lastKey: undefined,
-    };
-    let items = await fetchByUsername(fetchParams);
-    items = items.Items;
+  async showWithIdArr(params) {
+    const items = await Promise.all(
+      params.ids.map(async (id) => {
+        const item = await fetchById(id);
+        return item;
+      })
+    );
+
+    if (this.fromSameUser(items)) {
+      const widgetDataArr = [];
+      for (let i = 0; i < items.length; i++) {
+        const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
+        const itemUrl = `https://mintable.app/${items[i].category}/item/${SEO}/${items[i].id}`;
+        const userProfileUrl = `https://mintable.app/u/${items[i].owner}`;
+        const {
+          profileImg,
+          socialMedia,
+        } = await this.getProfileImgAndSocialMedia(items[i].owner);
+
+        const widgetData = {
+          image: items[i].preview_images[0],
+          username: items[i].owner,
+          storeId: items[i].store_id,
+          buyPrice:
+            items[i].buyNowPrice == 0
+              ? items[i].startingPrice
+              : items[i].buyNowPrice,
+          title: items[i].title,
+          subtitle: items[i].subtitle,
+          description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
+          category: items[i].category,
+          views: items[i].views,
+          currrencyUnit: items[i].currrency,
+          itemUrl,
+          userProfileUrl,
+          profileImg,
+          socialMedia,
+        };
+        widgetDataArr.push(widgetData);
+      }
+
+      this.setState({
+        backgroundColor: params.backgroundColor,
+        fontColor: params.fontColor,
+        subtitleFontColor: params.subtitleFontColor,
+        boxShadow: params.boxShadow,
+        fontFamily: params.fontFamily,
+        buttonColor: params.buttonColor,
+        buttonTextColor: params.buttonTextColor,
+
+        widgetDataArr,
+      });
+    }
+  }
+
+  async showWithUsernameOrStoreId(params, fetchType) {
+    let items;
+
+    if (fetchType === "username") {
+      const fetchParams = {
+        username: params.username,
+        size: 50,
+        lastKey: undefined,
+      };
+      items = await fetchByUsername(fetchParams);
+      items = items.Items;
+    }
+
+    if (fetchType === "storeId" && isNotFromMintableStore(params.storeId)) {
+      const fetchParams = {
+        store_id: params.storeId,
+        size: 100,
+        lastKey: "",
+      };
+      items = await fetchByStoreId(fetchParams);
+    }
 
     const widgetDataArr = [];
     for (let i = 0; i < items.length; i++) {
@@ -135,6 +217,7 @@ class Widget extends React.Component {
       const widgetData = {
         image: items[i].preview_images[0],
         username: items[i].owner,
+        storeId: items[i].store_id,
         buyPrice:
           items[i].buyNowPrice == 0
             ? items[i].startingPrice
@@ -175,6 +258,11 @@ class Widget extends React.Component {
     return SEO.replace(/[^a-zA-Z0-9-_]/g, "");
   }
 
+  fromSameUser(items) {
+    const user = items[0].username;
+    return items.every((item) => item.username === user);
+  }
+
   render() {
     const {
       backgroundColor,
@@ -198,9 +286,9 @@ class Widget extends React.Component {
               fontFamily: fontFamily,
             } || null
           }
-          className={styles.widgetContainer}
+          className={styles.fontContainer}
         >
-          {widgetData && this.isNotFromMintableStore(widgetData.storeId) && (
+          {widgetData && (
             <div
               style={
                 {
@@ -233,7 +321,13 @@ class Widget extends React.Component {
                   />
                 </video>
               )}
-              <div style={{ margin: "32px", position: "relative" }}>
+              <div
+                style={{
+                  margin: "32px",
+                  position: "relative",
+                  width: "100%",
+                }}
+              >
                 <div className={styles.artistFlexContainer}>
                   <div
                     style={{
@@ -251,6 +345,11 @@ class Widget extends React.Component {
                         borderRadius: "100%",
                       }}
                       src={`${PROFILE_S3_BUCKET}${widgetData.profileImg}`}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src =
+                          "https://d2alktbws33m8c.cloudfront.net/profile.jpeg";
+                      }}
                     />
                   </div>
                   <div
@@ -365,7 +464,7 @@ class Widget extends React.Component {
       );
     }
 
-    if (type === "username") {
+    if (type === "nftIdArr" || type === "username" || type === "storeId") {
       return (
         <div
           style={
@@ -373,7 +472,7 @@ class Widget extends React.Component {
               fontFamily: fontFamily,
             } || null
           }
-          className={styles.widgetContainer}
+          className={styles.fontContainer}
         >
           {widgetDataArr.length !== 0 && (
             <div
@@ -415,121 +514,117 @@ class Widget extends React.Component {
               </div>
 
               <div className={styles.gridContainer}>
-                {widgetDataArr.map((item, i) => {
-                  if (this.isNotFromMintableStore(item.storeId)) {
-                    return (
+                {widgetDataArr.map((item, i) => (
+                  <div
+                    style={
+                      {
+                        backgroundColor: backgroundColor,
+                      } || null
+                    }
+                    className={styles.gridItemCard}
+                    key={i}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        paddingBottom: "100%",
+                        position: "relative",
+                      }}
+                    >
+                      {!checkIfVideoExtension(item.image) ? (
+                        <img
+                          className={styles.gridItemcardImage}
+                          src={item.image}
+                        />
+                      ) : (
+                        <video
+                          key={item.image}
+                          className={styles.gridItemcardImage}
+                          autoPlay
+                          playsInline
+                          muted
+                          loop
+                          preload="metadata"
+                          poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
+                        >
+                          <source
+                            src={item.image}
+                            onError={(e) => {
+                              e.target.poster =
+                                "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
+                            }}
+                          />
+                        </video>
+                      )}
+                    </div>
+
+                    <div
+                      style={{
+                        margin: "16px",
+                      }}
+                    >
                       <div
                         style={
                           {
-                            backgroundColor: backgroundColor,
+                            color: subtitleFontColor,
                           } || null
                         }
-                        className={styles.gridItemCard}
-                        key={i}
+                        className={styles.gridSubtitle}
                       >
-                        <div
-                          style={{
-                            width: "100%",
-                            paddingBottom: "100%",
-                            position: "relative",
-                          }}
-                        >
-                          {!checkIfVideoExtension(item.image) ? (
-                            <img
-                              className={styles.gridItemcardImage}
-                              src={item.image}
-                            />
-                          ) : (
-                            <video
-                              key={item.image}
-                              className={styles.gridItemcardImage}
-                              autoPlay
-                              playsInline
-                              muted
-                              loop
-                              preload="metadata"
-                              poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
-                            >
-                              <source
-                                src={item.image}
-                                onError={(e) => {
-                                  e.target.poster =
-                                    "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
-                                }}
-                              />
-                            </video>
-                          )}
-                        </div>
+                        {item.category}
+                      </div>
+                      <h1
+                        style={
+                          {
+                            color: fontColor,
+                          } || null
+                        }
+                        className={styles.gridItemTitle}
+                      >
+                        {item.title}
+                      </h1>
 
-                        <div
-                          style={{
-                            margin: "16px",
-                          }}
+                      <div className={styles.absoluteBottomContainer}>
+                        <h2
+                          style={
+                            {
+                              color: fontColor,
+                            } || null
+                          }
+                          className={styles.itemPrice}
                         >
-                          <div
-                            style={
-                              {
-                                color: subtitleFontColor,
-                              } || null
-                            }
-                            className={styles.gridSubtitle}
-                          >
-                            {item.category}
-                          </div>
-                          <h1
-                            style={
-                              {
-                                color: fontColor,
-                              } || null
-                            }
-                            className={styles.gridItemTitle}
-                          >
-                            {item.title}
-                          </h1>
-
-                          <div className={styles.absoluteBottomContainer}>
-                            <h2
-                              style={
-                                {
-                                  color: fontColor,
-                                } || null
-                              }
-                              className={styles.itemPrice}
-                            >
-                              <strong>
-                                {item.currrencyUnit == "ETH"
-                                  ? item.buyPrice + " ETH"
-                                  : this.formatMoney(
-                                      this.state.ETHprice * item.buyPrice
-                                    )}
-                              </strong>
-                              <span>
-                                {" "}
-                                ({`\u039E`}
-                                {!item.currrencyUnit == "ETH"
-                                  ? item.buyPrice + " ETH"
-                                  : this.formatMoney(
-                                      this.state.ETHprice * item.buyPrice
-                                    )}
-                                )
-                              </span>
-                            </h2>
-                            <div
-                              style={
-                                {
-                                  color: subtitleFontColor,
-                                } || null
-                              }
-                              className={styles.gridSubtitle}
-                            >
-                              {item.username}
-                            </div>
-                          </div>
+                          <strong>
+                            {item.currrencyUnit == "ETH"
+                              ? item.buyPrice + " ETH"
+                              : this.formatMoney(
+                                  this.state.ETHprice * item.buyPrice
+                                )}
+                          </strong>
+                          <span>
+                            {" "}
+                            ({`\u039E`}
+                            {!item.currrencyUnit == "ETH"
+                              ? item.buyPrice + " ETH"
+                              : this.formatMoney(
+                                  this.state.ETHprice * item.buyPrice
+                                )}
+                            )
+                          </span>
+                        </h2>
+                        <div
+                          style={
+                            {
+                              color: subtitleFontColor,
+                            } || null
+                          }
+                          className={styles.gridSubtitle}
+                        >
+                          {item.username}
                         </div>
                       </div>
-                    );
-                  }
-                })}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div style={{ position: "relative" }}>
