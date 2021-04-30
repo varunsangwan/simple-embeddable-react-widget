@@ -1,12 +1,11 @@
 import React from "react";
-import instagramImg from "../assets/instagram.png";
-import redditImg from "../assets/reddit.png";
-import twitterImg from "../assets/twitter.png";
-import youtubeImg from "../assets/youtube.png";
+import instagramImg from "../assets/instagram.svg";
+import redditImg from "../assets/reddit.svg";
+import twitterImg from "../assets/twitter.svg";
 import styles from "./socialSharing.module.css";
 
 export default function SocialSharing(props) {
-  const { instagram, twitter, reddit, cent, youtube } = props;
+  const { instagram, twitter, reddit } = props;
 
   return (
     <div>
@@ -44,7 +43,7 @@ export default function SocialSharing(props) {
             </a>
           )}
         </li>
-        <li>
+        {/* <li>
           {cent && (
             <a
               href={`https://beta.cent.co/` + cent}
@@ -69,7 +68,7 @@ export default function SocialSharing(props) {
               <img className={styles.iconContainer} src={youtubeImg} alt="" />
             </a>
           )}
-        </li>
+        </li> */}
       </ul>
     </div>
   );

@@ -8,9 +8,7 @@ export const fetchByStoreId = async (data) => {
       `${fetchItem}bystoreid?network=${network}`,
       data
     );
-
-    //TODO - now we return just top 50
-    return res.Items.slice(0, 50);
+    return res;
   } catch (err) {
     console.log(err);
   }

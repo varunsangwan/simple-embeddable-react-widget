@@ -6,7 +6,6 @@ export const fetchById = async (id) => {
     await fetch(ESSearch + id)
       .then((res) => res.json())
       .then((data) => (fetchResult = data));
-    // console.log(fetchResult);
     return fetchResult._source.data;
   } catch (err) {
     console.log(err);

@@ -9,11 +9,18 @@ import { getETHPrice } from "../../utils/pricefeed";
 import SocialSharing from "../SocialSharing";
 import Description from "./Description";
 import styles from "./widget.module.css";
+
+const INITIAL_LOAD = 8;
+const STEP_SIZE = 8;
+
 class Widget extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       ETHprice: null,
+      rawItems: null,
+      lastKey: null,
+      maxKey: null,
 
       backgroundColor: null,
       fontColor: null,
@@ -27,6 +34,8 @@ class Widget extends React.Component {
       widgetData: null,
       widgetDataArr: [],
     };
+
+    this.loadMore = this.loadMore.bind(this);
   }
   async componentDidMount() {
     const price = await getETHPrice();
@@ -41,6 +50,16 @@ class Widget extends React.Component {
 
   isNotFromMintableStore(storeId) {
     return storeId !== "000000-0000000000";
+  }
+
+  loadMore() {
+    const { type, rawItems, lastKey, maxKey } = this.state;
+    if ((type === "username" || type === "storeId") && maxKey > lastKey) {
+      this.loadItems(rawItems.slice(lastKey, lastKey + STEP_SIZE));
+      this.setState({
+        lastKey: lastKey + STEP_SIZE,
+      });
+    }
   }
 
   async getProfileImgAndSocialMedia(username) {
@@ -135,75 +154,6 @@ class Widget extends React.Component {
       })
     );
 
-    if (this.fromSameUser(items)) {
-      const widgetDataArr = [];
-      for (let i = 0; i < items.length; i++) {
-        const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
-        const itemUrl = `https://mintable.app/${items[i].category}/item/${SEO}/${items[i].id}`;
-        const userProfileUrl = `https://mintable.app/u/${items[i].owner}`;
-        const {
-          profileImg,
-          socialMedia,
-        } = await this.getProfileImgAndSocialMedia(items[i].owner);
-
-        const widgetData = {
-          image: items[i].preview_images[0],
-          username: items[i].owner,
-          storeId: items[i].store_id,
-          buyPrice:
-            items[i].buyNowPrice == 0
-              ? items[i].startingPrice
-              : items[i].buyNowPrice,
-          title: items[i].title,
-          subtitle: items[i].subtitle,
-          description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
-          category: items[i].category,
-          views: items[i].views,
-          currrencyUnit: items[i].currrency,
-          itemUrl,
-          userProfileUrl,
-          profileImg,
-          socialMedia,
-        };
-        widgetDataArr.push(widgetData);
-      }
-
-      this.setState({
-        backgroundColor: params.backgroundColor,
-        fontColor: params.fontColor,
-        subtitleFontColor: params.subtitleFontColor,
-        boxShadow: params.boxShadow,
-        fontFamily: params.fontFamily,
-        buttonColor: params.buttonColor,
-        buttonTextColor: params.buttonTextColor,
-
-        widgetDataArr,
-      });
-    }
-  }
-
-  async showWithUsernameOrStoreId(params, fetchType) {
-    let items;
-
-    if (fetchType === "username") {
-      const fetchParams = {
-        username: params.username,
-        size: 50,
-        lastKey: undefined,
-      };
-      items = await fetchByUsername(fetchParams);
-      items = items.Items;
-    }
-
-    if (fetchType === "storeId" && isNotFromMintableStore(params.storeId)) {
-      const fetchParams = {
-        store_id: params.storeId,
-        size: 100,
-        lastKey: "",
-      };
-      items = await fetchByStoreId(fetchParams);
-    }
-
     const widgetDataArr = [];
     for (let i = 0; i < items.length; i++) {
       const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
@@ -249,6 +199,85 @@ class Widget extends React.Component {
     });
   }
 
+  async loadItems(items) {
+    const widgetDataArr = [...this.state.widgetDataArr];
+    for (let i = 0; i < items.length; i++) {
+      const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
+      const itemUrl = `https://mintable.app/${items[i].category}/item/${SEO}/${items[i].id}`;
+      const userProfileUrl = `https://mintable.app/u/${items[i].owner}`;
+      const {
+        profileImg,
+        socialMedia,
+      } = await this.getProfileImgAndSocialMedia(items[i].owner);
+      const widgetData = {
+        image: items[i].preview_images[0],
+        username: items[i].owner,
+        storeId: items[i].store_id,
+        buyPrice:
+          items[i].buyNowPrice == 0
+            ? items[i].startingPrice
+            : items[i].buyNowPrice,
+        title: items[i].title,
+        subtitle: items[i].subtitle,
+        description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
+        category: items[i].category,
+        views: items[i].views,
+        currrencyUnit: items[i].currrency,
+        itemUrl,
+        userProfileUrl,
+        profileImg,
+        socialMedia,
+      };
+      widgetDataArr.push(widgetData);
+    }
+    this.setState({
+      widgetDataArr,
+    });
+  }
+
+  async showWithUsernameOrStoreId(params, fetchType) {
+    let items;
+
+    if (fetchType === "username") {
+      const fetchParams = {
+        username: params.username,
+        // size: 8,
+        // lastKey: undefined,
+      };
+      items = await fetchByUsername(fetchParams);
+      items = items.Items;
+    }
+
+    if (
+      fetchType === "storeId" &&
+      this.isNotFromMintableStore(params.storeId)
+    ) {
+      const fetchParams = {
+        store_id: params.storeId,
+        // size: 8,
+        // lastKey: undefined,
+      };
+      items = await fetchByStoreId(fetchParams);
+      items = items.Items;
+    }
+    this.setState({
+      backgroundColor: params.backgroundColor,
+      fontColor: params.fontColor,
+      subtitleFontColor: params.subtitleFontColor,
+      boxShadow: params.boxShadow,
+      fontFamily: params.fontFamily,
+      buttonColor: params.buttonColor,
+      buttonTextColor: params.buttonTextColor,
+      rawItems: items,
+      lastKey: INITIAL_LOAD,
+      maxKey: items.length,
+    });
+
+    // here we have all the unprocessed items. (more than 8 as the api size param is not working)
+    // we take just the first 8 and process them. The rest is processed when needed
+    this.loadItems(items.slice(0, INITIAL_LOAD));
+  }
+
   getSEOstring(title, subtitle) {
     title = title.replace(/[\s(?=\s*$)]/g, "-");
     var regex = /[\s](?!$)/g;
@@ -256,11 +285,6 @@ class Widget extends React.Component {
     subtitle = subtitle.replace(regex, "-");
     let SEO = title.concat(subtitle);
     return SEO.replace(/[^a-zA-Z0-9-_]/g, "");
-  }
-
-  fromSameUser(items) {
-    const user = items[0].username;
-    return items.every((item) => item.username === user);
   }
 
   render() {
@@ -276,6 +300,9 @@ class Widget extends React.Component {
       type,
       widgetData,
       widgetDataArr,
+
+      lastKey,
+      maxKey,
     } = this.state;
 
     if (type === "nftId") {
@@ -487,8 +514,11 @@ class Widget extends React.Component {
             >
               <div className={styles.topContainer}>
                 <div className={styles.storeName}>
-                  {widgetDataArr[0].username}'s Store
+                  {type === "nftIdArr"
+                    ? "NFTs for sale at Mintable.app"
+                    : `${widgetDataArr[0].username}'s Store`}
                 </div>
+
                 <SocialSharing
                   instagram={
                     widgetDataArr[0].socialMedia.instagram !== "" &&
@@ -502,14 +532,14 @@ class Widget extends React.Component {
                     widgetDataArr[0].socialMedia.reddit !== "" &&
                     widgetDataArr[0].socialMedia.reddit
                   }
-                  cent={
-                    widgetDataArr[0].socialMedia.cent !== "" &&
-                    widgetDataArr[0].socialMedia.cent
-                  }
-                  youtube={
-                    widgetDataArr[0].socialMedia.youtube !== "" &&
-                    widgetDataArr[0].socialMedia.youtube
-                  }
+                  // cent={
+                  //   widgetDataArr[0].socialMedia.cent !== "" &&
+                  //   widgetDataArr[0].socialMedia.cent
+                  // }
+                  // youtube={
+                  //   widgetDataArr[0].socialMedia.youtube !== "" &&
+                  //   widgetDataArr[0].socialMedia.youtube
+                  // }
                 />
               </div>
 
@@ -584,44 +614,62 @@ class Widget extends React.Component {
                         {item.title}
                       </h1>
 
-                      <div className={styles.absoluteBottomContainer}>
-                        <h2
-                          style={
-                            {
-                              color: fontColor,
-                            } || null
-                          }
-                          className={styles.itemPrice}
-                        >
-                          <strong>
-                            {item.currrencyUnit == "ETH"
-                              ? item.buyPrice + " ETH"
-                              : this.formatMoney(
-                                  this.state.ETHprice * item.buyPrice
-                                )}
-                          </strong>
-                          <span>
-                            {" "}
-                            ({`\u039E`}
-                            {!item.currrencyUnit == "ETH"
-                              ? item.buyPrice + " ETH"
-                              : this.formatMoney(
-                                  this.state.ETHprice * item.buyPrice
-                                )}
-                            )
-                          </span>
-                        </h2>
+                      <h2
+                        style={
+                          {
+                            color: fontColor,
+                          } || null
+                        }
+                        className={styles.itemPrice}
+                      >
+                        <strong>
+                          {item.currrencyUnit == "ETH"
+                            ? item.buyPrice + " ETH"
+                            : this.formatMoney(
+                                this.state.ETHprice * item.buyPrice
+                              )}
+                        </strong>
+                        <span>
+                          {" "}
+                          ({`\u039E`}
+                          {!item.currrencyUnit == "ETH"
+                            ? item.buyPrice + " ETH"
+                            : this.formatMoney(
+                                this.state.ETHprice * item.buyPrice
+                              )}
+                          )
+                        </span>
+                      </h2>
+                      <div
+                        style={
+                          {
+                            color: subtitleFontColor,
+                          } || null
+                        }
+                        className={styles.gridSubtitle}
+                      >
+                        {item.username}
+                      </div>
+
+                      <a
+                        style={
+                          {
+                            backgroundColor: buttonColor,
+                          } || null
+                        }
+                        className={styles.buyNowSingle}
+                        href={item.itemUrl}
+                      >
                         <div
                           style={
                             {
-                              color: subtitleFontColor,
+                              color: buttonTextColor,
                             } || null
                           }
-                          className={styles.gridSubtitle}
                         >
-                          {item.username}
+                          Buy Now
                         </div>
-                      </div>
+                      </a>
                     </div>
                   </div>
                 ))}
@@ -642,21 +690,20 @@ class Widget extends React.Component {
                   />
                 </div>
 
-                <a
-                  href={widgetDataArr[0].userProfileUrl}
-                  className={styles.viewMore}
-                >
+                {type !== "nftIdArr" && maxKey > lastKey && (
                   <div
+                    onClick={this.loadMore}
+                    className={styles.loadMore}
                     style={
                       {
-                        color: buttonTextColor,
+                        color: buttonColor,
                         border: `1px solid ${buttonColor}`,
                       } || null
                     }
                   >
-                    View More on Mintable
+                    Load More
                   </div>
-                </a>
+                )}
               </div>
             </div>
           )}

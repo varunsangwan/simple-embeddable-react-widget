@@ -35,6 +35,17 @@ module.exports = (env) => {
             ],
           },
           { test: /\.png$/, use: "url-loader?mimetype=image/png" },
+          {
+            test: /\.svg$/,
+            use: [
+              {
+                loader: "svg-url-loader",
+                options: {
+                  limit: 10000,
+                },
+              },
+            ],
+          },
         ],
       },
       devServer: {

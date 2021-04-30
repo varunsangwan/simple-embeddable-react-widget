@@ -4,8 +4,8 @@ import { getRequestWithoutAuth } from "../utils/api";
 function preparePaginationQuery(data) {
   const params = {
     ...data,
-    size: (data && data.size) || 5,
-    lastKey: (data && data.lastKey) || 0,
+    // size: (data && data.size) || 8,
+    // lastKey: (data && data.lastKey) || 0,
   };
   return Object.keys(params)
     .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
@@ -14,7 +14,6 @@ function preparePaginationQuery(data) {
 
 export const fetchByUsername = async (data) => {
   const query = preparePaginationQuery(data);
-  console.log(query);
   const network = 1;
   try {
     const res = await getRequestWithoutAuth(
