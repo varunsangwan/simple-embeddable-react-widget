@@ -209,7 +209,7 @@ class Widget extends React.Component {
             ? items[i].startingPrice
             : items[i].buyNowPrice,
         title: items[i].title,
-        subtitle: items[i].subtitle,
+        subtitle: items[i].sub_title,
         description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
         category: items[i].category,
         views: items[i].views,
@@ -254,7 +254,7 @@ class Widget extends React.Component {
             ? items[i].startingPrice
             : items[i].buyNowPrice,
         title: items[i].title,
-        subtitle: items[i].subtitle,
+        subtitle: items[i].sub_title,
         description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
         category: items[i].category,
         views: items[i].views,
