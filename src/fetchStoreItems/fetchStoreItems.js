@@ -8,7 +8,7 @@ export const fetchByStoreId = async (data) => {
       `${fetchItem}bystoreid?network=${network}`,
       data
     );
-    return res;
+    return res.Items;
   } catch (err) {
     console.log(err);
   }

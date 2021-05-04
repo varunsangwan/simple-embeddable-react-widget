@@ -23,16 +23,15 @@ module.exports = (env) => {
           },
           {
             test: /\.css$/i,
-            exclude: /node_modules/,
-            use: [
-              "style-loader",
-              {
-                loader: "css-loader",
-                options: {
-                  modules: true,
-                },
-              },
+            include: [
+              path.resolve(__dirname, "node_modules"),
+              path.resolve(__dirname, "src"),
             ],
+            loaders: ["style-loader", "css-loader"],
+          },
+          {
+            test: /\.(woff|woff2|eot|ttf)$/,
+            use: ["url-loader?limit=100000"],
           },
           { test: /\.png$/, use: "url-loader?mimetype=image/png" },
           {

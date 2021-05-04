@@ -1,4 +1,6 @@
 import React from "react";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 import { PROFILE_S3_BUCKET, userProfile } from "../../config";
 import { fetchById } from "../../fetchItemId/fetchItemId";
 import { fetchByUsername } from "../../fetchItemUsername/fetchItemUsername";
@@ -7,16 +9,38 @@ import { getRequestWithoutAuth } from "../../utils/api";
 import { checkIfVideoExtension } from "../../utils/checkIfVideoExtension";
 import { getETHPrice } from "../../utils/pricefeed";
 import SocialSharing from "../SocialSharing";
+import CarouselCard from "./CarouselCard";
 import Description from "./Description";
 import styles from "./widget.module.css";
 
 const INITIAL_LOAD = 8;
 const STEP_SIZE = 8;
 
+const responsive = {
+  superLargeDesktop: {
+    breakpoint: { max: 4000, min: 3000 },
+    items: 6,
+  },
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 4,
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 2,
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1,
+  },
+};
+
 class Widget extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayed: 8,
+
       ETHprice: null,
       rawItems: null,
       lastKey: null,
@@ -31,16 +55,24 @@ class Widget extends React.Component {
       buttonTextColor: null,
 
       type: null, // nftId, nftIdArr, username, storeId
+      size: null, //normal, mini, mobile
       widgetData: null,
       widgetDataArr: [],
     };
 
     this.loadMore = this.loadMore.bind(this);
+    this.addCount = this.addCount.bind(this);
   }
   async componentDidMount() {
     const price = await getETHPrice();
     this.setState({
       ETHprice: price.usd,
+    });
+  }
+
+  addCount() {
+    this.setState({
+      displayed: this.state.displayed + 1,
     });
   }
 
@@ -73,11 +105,12 @@ class Widget extends React.Component {
   }
 
   showNft(params) {
-    const { ids, username, storeId } = params;
+    const { ids, username, storeId, size } = params;
     // one item id
     if (ids && ids.length === 1) {
       this.setState({
         type: "nftId",
+        size,
       });
       this.showWithId(params);
     }
@@ -86,6 +119,7 @@ class Widget extends React.Component {
     if (ids && ids.length !== 1) {
       this.setState({
         type: "nftIdArr",
+        size,
       });
       this.showWithIdArr(params);
     }
@@ -94,6 +128,7 @@ class Widget extends React.Component {
     if (username) {
       this.setState({
         type: "username",
+        size,
       });
       this.showWithUsernameOrStoreId(params, "username");
     }
@@ -102,6 +137,7 @@ class Widget extends React.Component {
     if (storeId) {
       this.setState({
         type: "storeId",
+        size,
       });
       this.showWithUsernameOrStoreId(params, "storeId");
     }
@@ -245,7 +281,6 @@ class Widget extends React.Component {
         // lastKey: undefined,
       };
       items = await fetchByUsername(fetchParams);
-      items = items.Items;
     }
 
     if (
@@ -258,7 +293,6 @@ class Widget extends React.Component {
         // lastKey: undefined,
       };
       items = await fetchByStoreId(fetchParams);
-      items = items.Items;
     }
     this.setState({
       backgroundColor: params.backgroundColor,
@@ -275,7 +309,11 @@ class Widget extends React.Component {
 
     // here we have all the unprocessed items. (more than 8 as the api size param is not working)
     // we take just the first 8 and process them. The rest is processed when needed
-    this.loadItems(items.slice(0, INITIAL_LOAD));
+    if (this.state.size === "mini") {
+      this.loadItems(items);
+    } else {
+      this.loadItems(items.slice(0, INITIAL_LOAD));
+    }
   }
 
   getSEOstring(title, subtitle) {
@@ -298,6 +336,7 @@ class Widget extends React.Component {
       buttonTextColor,
 
       type,
+      size,
       widgetData,
       widgetDataArr,
 
@@ -315,177 +354,555 @@ class Widget extends React.Component {
           }
           className={styles.fontContainer}
         >
-          {widgetData && (
-            <div
-              style={
-                {
-                  backgroundColor: backgroundColor,
-                  boxShadow:
-                    boxShadow && "0px 6px 15px -4px rgba(0, 0, 0, 0.2)",
-                } || null
-              }
-              className={styles.card}
-            >
-              {!checkIfVideoExtension(widgetData.image) ? (
-                <img className={styles.cardImage} src={widgetData.image} />
-              ) : (
-                <video
-                  key={widgetData.image}
-                  className={styles.cardImage}
-                  autoPlay
-                  playsInline
-                  muted
-                  loop
-                  preload="metadata"
-                  poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
-                >
-                  <source
-                    src={widgetData.image}
-                    onError={(e) => {
-                      e.target.poster =
-                        "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
-                    }}
+          {widgetData && size !== "mini" && size !== "mobile" && (
+            <>
+              <div className={styles.topContainer}>
+                <div className={styles.storeName}>
+                  {`${widgetData.username}'s Store`}
+                </div>
+                {widgetData.socialMedia && (
+                  <SocialSharing
+                    instagram={
+                      widgetData.socialMedia.instagram !== "" &&
+                      widgetData.socialMedia.instagram
+                    }
+                    twitter={
+                      widgetData.socialMedia.twitter !== "" &&
+                      widgetData.socialMedia.twitter
+                    }
+                    reddit={
+                      widgetData.socialMedia.reddit !== "" &&
+                      widgetData.socialMedia.reddit
+                    }
                   />
-                </video>
-              )}
+                )}
+              </div>
               <div
-                style={{
-                  margin: "32px",
-                  position: "relative",
-                  width: "100%",
-                }}
+                style={
+                  {
+                    backgroundColor: backgroundColor,
+                    boxShadow:
+                      boxShadow && "0px 6px 15px -4px rgba(0, 0, 0, 0.2)",
+                  } || null
+                }
+                className={styles.card}
               >
-                <div className={styles.artistFlexContainer}>
-                  <div
-                    style={{
-                      backgroundColor: "#000",
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "100%",
-                    }}
+                {!checkIfVideoExtension(widgetData.image) ? (
+                  <img className={styles.cardImage} src={widgetData.image} />
+                ) : (
+                  <video
+                    key={widgetData.image}
+                    className={styles.cardImage}
+                    autoPlay
+                    playsInline
+                    muted
+                    loop
+                    preload="metadata"
+                    poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
                   >
-                    <img
+                    <source
+                      src={widgetData.image}
+                      onError={(e) => {
+                        e.target.poster =
+                          "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
+                      }}
+                    />
+                  </video>
+                )}
+                <div
+                  style={{
+                    margin: "16px",
+                    position: "relative",
+                    width: "100%",
+                  }}
+                >
+                  <div className={styles.artistFlexContainer}>
+                    <div
                       style={{
                         backgroundColor: "#000",
                         width: "48px",
                         height: "48px",
                         borderRadius: "100%",
                       }}
-                      src={`${PROFILE_S3_BUCKET}${widgetData.profileImg}`}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src =
-                          "https://d2alktbws33m8c.cloudfront.net/profile.jpeg";
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      marginLeft: "16px",
-                    }}
-                  >
-                    <a
-                      href={widgetData.userProfileUrl}
-                      style={
-                        {
-                          color: fontColor,
-                        } || null
-                      }
-                      className={styles.artistName}
                     >
-                      {widgetData.username}
-                    </a>
+                      <img
+                        style={{
+                          backgroundColor: "#000",
+                          width: "48px",
+                          height: "48px",
+                          borderRadius: "100%",
+                        }}
+                        src={`${PROFILE_S3_BUCKET}${widgetData.profileImg}`}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src =
+                            "https://d2alktbws33m8c.cloudfront.net/profile.jpeg";
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        marginLeft: "16px",
+                      }}
+                    >
+                      <a
+                        href={widgetData.userProfileUrl}
+                        style={
+                          {
+                            color: fontColor,
+                          } || null
+                        }
+                        className={styles.artistName}
+                      >
+                        {widgetData.username}
+                      </a>
+                      <div
+                        style={
+                          {
+                            color: subtitleFontColor,
+                          } || null
+                        }
+                        className={styles.artistLabel}
+                      >
+                        Artist
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    style={
+                      {
+                        color: subtitleFontColor,
+                      } || null
+                    }
+                    className={styles.itemType}
+                  >
+                    {widgetData.category}
+                  </div>
+
+                  <h1
+                    style={
+                      {
+                        color: fontColor,
+                      } || null
+                    }
+                    className={styles.itemTitle}
+                  >
+                    {widgetData.title}
+                  </h1>
+
+                  <h2
+                    style={
+                      {
+                        color: fontColor,
+                      } || null
+                    }
+                    className={styles.itemPrice}
+                  >
+                    <strong>
+                      {widgetData.currrencyUnit == "ETH"
+                        ? widgetData.buyPrice + " ETH"
+                        : this.formatMoney(
+                            this.state.ETHprice * widgetData.buyPrice
+                          )}
+                    </strong>
+                    <span>
+                      {" "}
+                      ({`\u039E`}
+                      {!widgetData.currrencyUnit == "ETH"
+                        ? widgetData.buyPrice + " ETH"
+                        : this.formatMoney(
+                            this.state.ETHprice * widgetData.buyPrice
+                          )}
+                      )
+                    </span>
+                  </h2>
+
+                  <Description
+                    fontColor={fontColor}
+                    buttonColor={buttonColor}
+                    descriptionData={widgetData.description}
+                  />
+
+                  <a
+                    style={
+                      {
+                        backgroundColor: buttonColor,
+                      } || null
+                    }
+                    className={styles.buyNow}
+                    href={widgetData.itemUrl}
+                  >
                     <div
                       style={
                         {
-                          color: subtitleFontColor,
+                          color: buttonTextColor,
                         } || null
                       }
-                      className={styles.artistLabel}
                     >
-                      Artist
+                      Buy Now
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </>
+          )}
+
+          {widgetData && size === "mini" && (
+            <>
+              <div className={styles.topContainer}>
+                <div className={styles.storeName}>
+                  {`${widgetData.username}'s Store`}
+                </div>
+                {widgetData.socialMedia && (
+                  <SocialSharing
+                    instagram={
+                      widgetData.socialMedia.instagram !== "" &&
+                      widgetData.socialMedia.instagram
+                    }
+                    twitter={
+                      widgetData.socialMedia.twitter !== "" &&
+                      widgetData.socialMedia.twitter
+                    }
+                    reddit={
+                      widgetData.socialMedia.reddit !== "" &&
+                      widgetData.socialMedia.reddit
+                    }
+                  />
+                )}
+              </div>
+              <div
+                style={
+                  {
+                    backgroundColor: backgroundColor,
+                    boxShadow:
+                      boxShadow && "0px 6px 15px -4px rgba(0, 0, 0, 0.2)",
+                  } || null
+                }
+                className={styles.card}
+              >
+                {!checkIfVideoExtension(widgetData.image) ? (
+                  <img
+                    className={styles.miniCardImage}
+                    src={widgetData.image}
+                  />
+                ) : (
+                  <video
+                    key={widgetData.image}
+                    className={styles.miniCardImage}
+                    autoPlay
+                    playsInline
+                    muted
+                    loop
+                    preload="metadata"
+                    poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
+                  >
+                    <source
+                      src={widgetData.image}
+                      onError={(e) => {
+                        e.target.poster =
+                          "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
+                      }}
+                    />
+                  </video>
+                )}
+                <div
+                  style={{
+                    padding: "16px",
+                    boxSizing: "border-box",
+                    position: "relative",
+                    height: "250px",
+                    width: "70%",
+                  }}
+                >
+                  <div className={styles.artistFlexContainer}>
+                    <div
+                      style={{
+                        backgroundColor: "#000",
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "100%",
+                      }}
+                    >
+                      <img
+                        style={{
+                          backgroundColor: "#000",
+                          width: "48px",
+                          height: "48px",
+                          borderRadius: "100%",
+                        }}
+                        src={`${PROFILE_S3_BUCKET}${widgetData.profileImg}`}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src =
+                            "https://d2alktbws33m8c.cloudfront.net/profile.jpeg";
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        marginLeft: "16px",
+                      }}
+                    >
+                      <a
+                        href={widgetData.userProfileUrl}
+                        style={
+                          {
+                            color: fontColor,
+                          } || null
+                        }
+                        className={styles.artistName}
+                      >
+                        {widgetData.username}
+                      </a>
+                      <div
+                        style={
+                          {
+                            color: subtitleFontColor,
+                          } || null
+                        }
+                        className={styles.artistLabel}
+                      >
+                        Artist
+                      </div>
                     </div>
                   </div>
+
+                  <div
+                    style={
+                      {
+                        color: subtitleFontColor,
+                      } || null
+                    }
+                    className={styles.itemType}
+                  >
+                    {widgetData.category}
+                  </div>
+
+                  <h1
+                    style={
+                      {
+                        color: fontColor,
+                      } || null
+                    }
+                    className={styles.itemTitle}
+                  >
+                    {widgetData.title}
+                  </h1>
+
+                  <h2
+                    style={
+                      {
+                        color: fontColor,
+                      } || null
+                    }
+                    className={styles.itemPrice}
+                  >
+                    <strong>
+                      {widgetData.currrencyUnit == "ETH"
+                        ? widgetData.buyPrice + " ETH"
+                        : this.formatMoney(
+                            this.state.ETHprice * widgetData.buyPrice
+                          )}
+                    </strong>
+                    <span>
+                      {" "}
+                      ({`\u039E`}
+                      {!widgetData.currrencyUnit == "ETH"
+                        ? widgetData.buyPrice + " ETH"
+                        : this.formatMoney(
+                            this.state.ETHprice * widgetData.buyPrice
+                          )}
+                      )
+                    </span>
+                  </h2>
+
+                  <a
+                    style={
+                      {
+                        backgroundColor: buttonColor,
+                        color: buttonTextColor,
+                      } || null
+                    }
+                    className={styles.miniBuyNow}
+                    href={widgetData.itemUrl}
+                  >
+                    Buy Now
+                  </a>
                 </div>
+              </div>
+            </>
+          )}
+
+          {widgetData && size === "mobile" && (
+            <>
+              <div
+                style={{ paddingTop: "16px" }}
+                className={styles.artistFlexContainer}
+              >
+                <div
+                  style={{
+                    backgroundColor: "#000",
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "100%",
+                  }}
+                >
+                  <img
+                    style={{
+                      backgroundColor: "#000",
+                      width: "64px",
+                      height: "64px",
+                      borderRadius: "100%",
+                    }}
+                    src={`${PROFILE_S3_BUCKET}${widgetData.profileImg}`}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://d2alktbws33m8c.cloudfront.net/profile.jpeg";
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginLeft: "16px",
+                  }}
+                >
+                  <div className={styles.storeName}>
+                    {`${widgetData.username}'s Store`}
+                  </div>
+                  {widgetData.socialMedia && (
+                    <div style={{ marginLeft: "-4px", marginTop: "4px" }}>
+                      <SocialSharing
+                        instagram={
+                          widgetData.socialMedia.instagram !== "" &&
+                          widgetData.socialMedia.instagram
+                        }
+                        twitter={
+                          widgetData.socialMedia.twitter !== "" &&
+                          widgetData.socialMedia.twitter
+                        }
+                        reddit={
+                          widgetData.socialMedia.reddit !== "" &&
+                          widgetData.socialMedia.reddit
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div
+                style={
+                  {
+                    backgroundColor: backgroundColor,
+                    boxShadow:
+                      boxShadow && "0px 6px 15px -4px rgba(0, 0, 0, 0.2)",
+                  } || null
+                }
+                className={styles.mobileCard}
+              >
+                {!checkIfVideoExtension(widgetData.image) ? (
+                  <img
+                    className={styles.mobileCardImage}
+                    src={widgetData.image}
+                  />
+                ) : (
+                  <video
+                    key={widgetData.image}
+                    className={styles.mobileCardImage}
+                    autoPlay
+                    playsInline
+                    muted
+                    loop
+                    preload="metadata"
+                    poster="https://d1iczm3wxxz9zd.cloudfront.net/video.png"
+                  >
+                    <source
+                      src={widgetData.image}
+                      onError={(e) => {
+                        e.target.poster =
+                          "https://d1iczm3wxxz9zd.cloudfront.net/video.png";
+                      }}
+                    />
+                  </video>
+                )}
 
                 <div
-                  style={
-                    {
-                      color: subtitleFontColor,
-                    } || null
-                  }
-                  className={styles.itemType}
-                >
-                  {widgetData.category}
-                </div>
-
-                <h1
-                  style={
-                    {
-                      color: fontColor,
-                    } || null
-                  }
-                  className={styles.itemTitle}
-                >
-                  {widgetData.title}
-                </h1>
-
-                <h2
-                  style={
-                    {
-                      color: fontColor,
-                    } || null
-                  }
-                  className={styles.itemPrice}
-                >
-                  <strong>
-                    {widgetData.currrencyUnit == "ETH"
-                      ? widgetData.buyPrice + " ETH"
-                      : this.formatMoney(
-                          this.state.ETHprice * widgetData.buyPrice
-                        )}
-                  </strong>
-                  <span>
-                    {" "}
-                    ({`\u039E`}
-                    {!widgetData.currrencyUnit == "ETH"
-                      ? widgetData.buyPrice + " ETH"
-                      : this.formatMoney(
-                          this.state.ETHprice * widgetData.buyPrice
-                        )}
-                    )
-                  </span>
-                </h2>
-
-                <Description
-                  fontColor={fontColor}
-                  buttonColor={buttonColor}
-                  descriptionData={widgetData.description}
-                />
-
-                <a
-                  style={
-                    {
-                      backgroundColor: buttonColor,
-                    } || null
-                  }
-                  className={styles.buyNow}
-                  href={widgetData.itemUrl}
+                  style={{
+                    padding: "16px",
+                    position: "relative",
+                  }}
                 >
                   <div
                     style={
                       {
+                        color: subtitleFontColor,
+                      } || null
+                    }
+                    className={styles.mobileItemType}
+                  >
+                    {widgetData.category}
+                  </div>
+                  <h1
+                    style={
+                      {
+                        color: fontColor,
+                      } || null
+                    }
+                    className={styles.itemTitle}
+                  >
+                    {widgetData.title}
+                  </h1>
+
+                  <h2
+                    style={
+                      {
+                        color: fontColor,
+                      } || null
+                    }
+                    className={styles.itemPrice}
+                  >
+                    <strong>
+                      {widgetData.currrencyUnit == "ETH"
+                        ? widgetData.buyPrice + " ETH"
+                        : this.formatMoney(
+                            this.state.ETHprice * widgetData.buyPrice
+                          )}
+                    </strong>
+                    <span>
+                      {" "}
+                      ({`\u039E`}
+                      {!widgetData.currrencyUnit == "ETH"
+                        ? widgetData.buyPrice + " ETH"
+                        : this.formatMoney(
+                            this.state.ETHprice * widgetData.buyPrice
+                          )}
+                      )
+                    </span>
+                  </h2>
+
+                  <a
+                    style={
+                      {
+                        backgroundColor: buttonColor,
                         color: buttonTextColor,
                       } || null
                     }
+                    className={styles.mobileBuyNow}
+                    href={widgetData.itemUrl}
                   >
                     Buy Now
-                  </div>
-                </a>
+                  </a>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       );
@@ -514,52 +931,45 @@ class Widget extends React.Component {
             >
               <div className={styles.topContainer}>
                 <div className={styles.storeName}>
-                  {type === "nftIdArr"
-                    ? "NFTs for sale at Mintable.app"
-                    : `${widgetDataArr[0].username}'s Store`}
+                  NFTs for sale at Mintable.app
                 </div>
-
-                <SocialSharing
-                  instagram={
-                    widgetDataArr[0].socialMedia.instagram !== "" &&
-                    widgetDataArr[0].socialMedia.instagram
-                  }
-                  twitter={
-                    widgetDataArr[0].socialMedia.twitter !== "" &&
-                    widgetDataArr[0].socialMedia.twitter
-                  }
-                  reddit={
-                    widgetDataArr[0].socialMedia.reddit !== "" &&
-                    widgetDataArr[0].socialMedia.reddit
-                  }
-                  // cent={
-                  //   widgetDataArr[0].socialMedia.cent !== "" &&
-                  //   widgetDataArr[0].socialMedia.cent
-                  // }
-                  // youtube={
-                  //   widgetDataArr[0].socialMedia.youtube !== "" &&
-                  //   widgetDataArr[0].socialMedia.youtube
-                  // }
-                />
+                {widgetDataArr[0].socialMedia && (
+                  <SocialSharing
+                    instagram={
+                      widgetDataArr[0].socialMedia.instagram !== "" &&
+                      widgetDataArr[0].socialMedia.instagram
+                    }
+                    twitter={
+                      widgetDataArr[0].socialMedia.twitter !== "" &&
+                      widgetDataArr[0].socialMedia.twitter
+                    }
+                    reddit={
+                      widgetDataArr[0].socialMedia.reddit !== "" &&
+                      widgetDataArr[0].socialMedia.reddit
+                    }
+                    // cent={
+                    //   widgetDataArr[0].socialMedia.cent !== "" &&
+                    //   widgetDataArr[0].socialMedia.cent
+                    // }
+                    // youtube={
+                    //   widgetDataArr[0].socialMedia.youtube !== "" &&
+                    //   widgetDataArr[0].socialMedia.youtube
+                    // }
+                  />
+                )}
               </div>
 
-              <div className={styles.gridContainer}>
-                {widgetDataArr.map((item, i) => (
-                  <div
-                    style={
-                      {
-                        backgroundColor: backgroundColor,
-                      } || null
-                    }
-                    className={styles.gridItemCard}
-                    key={i}
-                  >
+              {size !== "mini" && (
+                <div className={styles.gridContainer}>
+                  {widgetDataArr.map((item, i) => (
                     <div
-                      style={{
-                        width: "100%",
-                        paddingBottom: "100%",
-                        position: "relative",
-                      }}
+                      style={
+                        {
+                          backgroundColor: backgroundColor,
+                        } || null
+                      }
+                      className={styles.gridItemCard}
+                      key={i}
                     >
                       {!checkIfVideoExtension(item.image) ? (
                         <img
@@ -586,94 +996,131 @@ class Widget extends React.Component {
                           />
                         </video>
                       )}
-                    </div>
 
-                    <div
-                      style={{
-                        margin: "16px",
-                      }}
-                    >
                       <div
-                        style={
-                          {
-                            color: subtitleFontColor,
-                          } || null
-                        }
-                        className={styles.gridSubtitle}
-                      >
-                        {item.category}
-                      </div>
-                      <h1
-                        style={
-                          {
-                            color: fontColor,
-                          } || null
-                        }
-                        className={styles.gridItemTitle}
-                      >
-                        {item.title}
-                      </h1>
-
-                      <h2
-                        style={
-                          {
-                            color: fontColor,
-                          } || null
-                        }
-                        className={styles.itemPrice}
-                      >
-                        <strong>
-                          {item.currrencyUnit == "ETH"
-                            ? item.buyPrice + " ETH"
-                            : this.formatMoney(
-                                this.state.ETHprice * item.buyPrice
-                              )}
-                        </strong>
-                        <span>
-                          {" "}
-                          ({`\u039E`}
-                          {!item.currrencyUnit == "ETH"
-                            ? item.buyPrice + " ETH"
-                            : this.formatMoney(
-                                this.state.ETHprice * item.buyPrice
-                              )}
-                          )
-                        </span>
-                      </h2>
-                      <div
-                        style={
-                          {
-                            color: subtitleFontColor,
-                          } || null
-                        }
-                        className={styles.gridSubtitle}
-                      >
-                        {item.username}
-                      </div>
-
-                      <a
-                        style={
-                          {
-                            backgroundColor: buttonColor,
-                          } || null
-                        }
-                        className={styles.buyNowSingle}
-                        href={item.itemUrl}
+                        style={{
+                          margin: "12px",
+                        }}
                       >
                         <div
                           style={
                             {
-                              color: buttonTextColor,
+                              color: subtitleFontColor,
                             } || null
                           }
+                          className={styles.gridSubtitle}
                         >
-                          Buy Now
+                          {item.category}
                         </div>
-                      </a>
+                        <h1
+                          style={
+                            {
+                              color: fontColor,
+                            } || null
+                          }
+                          className={styles.gridItemTitle}
+                        >
+                          {item.title}
+                        </h1>
+
+                        <h2
+                          style={
+                            {
+                              color: fontColor,
+                            } || null
+                          }
+                          className={styles.itemPrice}
+                        >
+                          <strong>
+                            {item.currrencyUnit == "ETH"
+                              ? item.buyPrice + " ETH"
+                              : this.formatMoney(
+                                  this.state.ETHprice * item.buyPrice
+                                )}
+                          </strong>
+                          <div>
+                            {" "}
+                            (
+                            <span
+                              style={{ fontFamily: "sans-serif" }}
+                            >{`\u039E`}</span>
+                            {!item.currrencyUnit == "ETH"
+                              ? item.buyPrice + " ETH"
+                              : this.formatMoney(
+                                  this.state.ETHprice * item.buyPrice
+                                )}
+                            )
+                          </div>
+                        </h2>
+                        <div
+                          style={
+                            {
+                              color: subtitleFontColor,
+                            } || null
+                          }
+                          className={styles.gridSubtitle}
+                        >
+                          {item.username}
+                        </div>
+
+                        <a
+                          style={
+                            {
+                              backgroundColor: buttonColor,
+                            } || null
+                          }
+                          className={styles.buyNowSingle}
+                          href={item.itemUrl}
+                        >
+                          <div
+                            style={
+                              {
+                                color: buttonTextColor,
+                              } || null
+                            }
+                          >
+                            Buy Now
+                          </div>
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {size === "mini" && (
+                <Carousel
+                  containerClass={styles.carousel}
+                  swipeable={true}
+                  responsive={responsive}
+                  // infinite={true}
+                  keyBoardControl={true}
+                  transitionDuration={1}
+                  arrows={true}
+                  afterChange={() => {
+                    this.addCount();
+                  }}
+                >
+                  {widgetDataArr.map((item, i) => {
+                    return (
+                      <CarouselCard
+                        item={item}
+                        displayed={this.state.displayed}
+                        index={i}
+                        key={i}
+                        ETHprice={this.state.ETHprice}
+                        customStyles={{
+                          backgroundColor,
+                          fontColor,
+                          subtitleFontColor,
+                          buttonColor,
+                          buttonTextColor,
+                        }}
+                      />
+                    );
+                  })}
+                </Carousel>
+              )}
 
               <div style={{ position: "relative" }}>
                 <div className={styles.poweredBy}>
@@ -690,7 +1137,7 @@ class Widget extends React.Component {
                   />
                 </div>
 
-                {type !== "nftIdArr" && maxKey > lastKey && (
+                {type !== "nftIdArr" && size !== "mini" && maxKey > lastKey && (
                   <div
                     onClick={this.loadMore}
                     className={styles.loadMore}

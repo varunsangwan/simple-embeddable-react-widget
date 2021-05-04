@@ -19,7 +19,8 @@ export const fetchByUsername = async (data) => {
     const res = await getRequestWithoutAuth(
       fetchCurrentItem + "?" + query + `&network=${network}`
     );
-    return res;
+    const items = res.Items.filter((item) => item.state === "ACTIVE");
+    return items;
   } catch (err) {
     console.log(err);
   }

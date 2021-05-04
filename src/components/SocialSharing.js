@@ -8,42 +8,41 @@ export default function SocialSharing(props) {
   const { instagram, twitter, reddit } = props;
 
   return (
-    <div>
-      <ul className={styles.container}>
-        <li>
-          {instagram && (
-            <a
-              href={`https://instagram.com/` + instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img className={styles.iconContainer} src={instagramImg} alt="" />
-            </a>
-          )}
-        </li>
-        <li>
-          {twitter && (
-            <a
-              href={`https://twitter.com/` + twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img className={styles.iconContainer} src={twitterImg} alt="" />
-            </a>
-          )}
-        </li>
-        <li>
-          {reddit && (
-            <a
-              href={`https://reddit.com/u/` + reddit}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img className={styles.iconContainer} src={redditImg} alt="" />
-            </a>
-          )}
-        </li>
-        {/* <li>
+    <div className={styles.container}>
+      <div>
+        {true && (
+          <a
+            href={`https://instagram.com/` + instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img className={styles.iconContainer} src={instagramImg} alt="" />
+          </a>
+        )}
+      </div>
+      <div>
+        {twitter && (
+          <a
+            href={`https://twitter.com/` + twitter}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img className={styles.iconContainer} src={twitterImg} alt="" />
+          </a>
+        )}
+      </div>
+      <div>
+        {reddit && (
+          <a
+            href={`https://reddit.com/u/` + reddit}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img className={styles.iconContainer} src={redditImg} alt="" />
+          </a>
+        )}
+      </div>
+      {/* <div>
           {cent && (
             <a
               href={`https://beta.cent.co/` + cent}
@@ -57,8 +56,8 @@ export default function SocialSharing(props) {
               />
             </a>
           )}
-        </li>
-        <li>
+        </div>
+        <div>
           {youtube && (
             <a
               href={`https://youtube.com/` + youtube}
@@ -68,8 +67,7 @@ export default function SocialSharing(props) {
               <img className={styles.iconContainer} src={youtubeImg} alt="" />
             </a>
           )}
-        </li> */}
-      </ul>
+        </div> */}
     </div>
   );
 }
