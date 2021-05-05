@@ -116,16 +116,25 @@ export default class CarouselCard extends React.Component {
             className={styles.itemPrice}
           >
             <strong>
-              {item.currrencyUnit == "ETH"
-                ? item.buyPrice + " ETH"
-                : this.formatMoney(ETHprice * item.buyPrice)}
+              {item.currencyUnit == "ETH" ? (
+                <>
+                  <span style={{ fontFamily: "sans-serif" }}>{`\u039E`}</span>
+                  {item.buyPrice}
+                </>
+              ) : (
+                this.formatMoney(ETHprice * item.buyPrice)
+              )}{" "}
             </strong>
             <div>
-              {" "}
-              (<span style={{ fontFamily: "sans-serif" }}>{`\u039E`}</span>
-              {!item.currrencyUnit == "ETH"
-                ? item.buyPrice + " ETH"
-                : this.formatMoney(ETHprice * item.buyPrice)}
+              (
+              {!item.currencyUnit == "ETH" ? (
+                <>
+                  <span style={{ fontFamily: "sans-serif" }}>{`\u039E`}</span>
+                  {item.buyPrice}
+                </>
+              ) : (
+                this.formatMoney(ETHprice * item.buyPrice)
+              )}
               )
             </div>
           </h2>

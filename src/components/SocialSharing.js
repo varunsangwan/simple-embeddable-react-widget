@@ -10,34 +10,22 @@ export default function SocialSharing(props) {
   return (
     <div className={styles.container}>
       <div>
-        {true && (
-          <a
-            href={`https://instagram.com/` + instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+        {instagram && (
+          <a href={instagram} target="_blank" rel="noopener noreferrer">
             <img className={styles.iconContainer} src={instagramImg} alt="" />
           </a>
         )}
       </div>
       <div>
         {twitter && (
-          <a
-            href={`https://twitter.com/` + twitter}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={twitter} target="_blank" rel="noopener noreferrer">
             <img className={styles.iconContainer} src={twitterImg} alt="" />
           </a>
         )}
       </div>
       <div>
         {reddit && (
-          <a
-            href={`https://reddit.com/u/` + reddit}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={reddit} target="_blank" rel="noopener noreferrer">
             <img className={styles.iconContainer} src={redditImg} alt="" />
           </a>
         )}

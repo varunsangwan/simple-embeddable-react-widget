@@ -1,3 +1,15 @@
+.mobileContainer {
+  display: none;
+}
+
+.normalContainer {
+  display: block;
+}
+
+.miniContainer {
+  display: block;
+}
+
 .carousel {
   padding-bottom: 16px;
 }
@@ -14,16 +26,18 @@
 
 .mobileCard {
   margin-top: 16px;
+  min-width: 250px;
+  max-width: 350px;
 }
 
 .cardImage {
-  width: 30%;
+  width: 40%;
   height: 500px;
   object-fit: cover;
 }
 
 .miniCardImage {
-  width: 30%;
+  width: 40%;
   height: 250px;
   object-fit: cover;
 }
@@ -82,6 +96,9 @@
   font-size: 1.125rem;
   color: #2d2d2d;
   margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  white-space: pre-wrap;
 }
 
 .descriptionTab {
@@ -194,6 +211,8 @@
   box-shadow: 0px 5px 12px -3px rgba(0, 0, 0, 0.2);
   position: relative;
   height: 420px;
+  min-width: 250px;
+  max-width: 350px;
 }
 
 .gridItemcardImage {
@@ -263,6 +282,18 @@
 }
 
 @media screen and (max-width: 767px) {
+  .mobileContainer {
+    display: block;
+  }
+
+  .normalContainer {
+    display: none;
+  }
+
+  .miniContainer {
+    display: none;
+  }
+
   .loadMore {
     cursor: pointer;
     text-align: center;

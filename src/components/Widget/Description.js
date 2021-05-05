@@ -81,7 +81,7 @@ class Description extends React.Component {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "center",
+            justifyContent: "flex-start",
           }}
         >
           <div

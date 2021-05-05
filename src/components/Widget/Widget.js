@@ -55,7 +55,7 @@ class Widget extends React.Component {
       buttonTextColor: null,
 
       type: null, // nftId, nftIdArr, username, storeId
-      size: null, //normal, mini, mobile
+      size: null, //normal, mini
       widgetData: null,
       widgetDataArr: [],
     };
@@ -77,7 +77,7 @@ class Widget extends React.Component {
   }
 
   formatMoney(n) {
-    return "$ " + (Math.round(n * 100) / 100).toLocaleString();
+    return "$" + (Math.round(n * 100) / 100).toLocaleString();
   }
 
   isNotFromMintableStore(storeId) {
@@ -158,11 +158,11 @@ class Widget extends React.Component {
       storeId: item.store_id,
       buyPrice: item.buyNowPrice == 0 ? item.startingPrice : item.buyNowPrice,
       title: item.title,
-      subtitle: item.subtitle,
+      // subtitle: item.sub_title,
       description: item.description.replace(/<\/?p[^>]*>/g, ""),
       category: item.category,
-      views: item.views,
-      currrencyUnit: item.currrency,
+      // views: item.views,
+      currencyUnit: item.currency,
       itemUrl,
       userProfileUrl,
       profileImg,
@@ -189,7 +189,6 @@ class Widget extends React.Component {
         return item;
       })
     );
-
     const widgetDataArr = [];
     for (let i = 0; i < items.length; i++) {
       const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
@@ -209,11 +208,11 @@ class Widget extends React.Component {
             ? items[i].startingPrice
             : items[i].buyNowPrice,
         title: items[i].title,
-        subtitle: items[i].sub_title,
+        // subtitle: items[i].sub_title,
         description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
         category: items[i].category,
-        views: items[i].views,
-        currrencyUnit: items[i].currrency,
+        // views: items[i].view_count,
+        currencyUnit: items[i].currency,
         itemUrl,
         userProfileUrl,
         profileImg,
@@ -254,11 +253,11 @@ class Widget extends React.Component {
             ? items[i].startingPrice
             : items[i].buyNowPrice,
         title: items[i].title,
-        subtitle: items[i].sub_title,
+        // subtitle: items[i].sub_title,
         description: items[i].description.replace(/<\/?p[^>]*>/g, ""),
         category: items[i].category,
-        views: items[i].views,
-        currrencyUnit: items[i].currrency,
+        // views: items[i].view_count,
+        currencyUnit: items[i].currency,
         itemUrl,
         userProfileUrl,
         profileImg,
@@ -354,8 +353,8 @@ class Widget extends React.Component {
           }
           className={styles.fontContainer}
         >
-          {widgetData && size !== "mini" && size !== "mobile" && (
-            <>
+          {widgetData && size !== "mini" && (
+            <div className={styles.normalContainer}>
               <div className={styles.topContainer}>
                 <div className={styles.storeName}>
                   {`${widgetData.username}'s Store`}
@@ -502,22 +501,35 @@ class Widget extends React.Component {
                     className={styles.itemPrice}
                   >
                     <strong>
-                      {widgetData.currrencyUnit == "ETH"
-                        ? widgetData.buyPrice + " ETH"
-                        : this.formatMoney(
-                            this.state.ETHprice * widgetData.buyPrice
-                          )}
+                      {widgetData.currencyUnit == "ETH" ? (
+                        <>
+                          <span style={{ fontFamily: "sans-serif" }}>
+                            {`\u039E`}
+                          </span>
+                          {widgetData.buyPrice}
+                        </>
+                      ) : (
+                        this.formatMoney(
+                          this.state.ETHprice * widgetData.buyPrice
+                        )
+                      )}{" "}
                     </strong>
-                    <span>
-                      {" "}
-                      ({`\u039E`}
-                      {!widgetData.currrencyUnit == "ETH"
-                        ? widgetData.buyPrice + " ETH"
-                        : this.formatMoney(
-                            this.state.ETHprice * widgetData.buyPrice
-                          )}
+                    <div>
+                      (
+                      {!widgetData.currencyUnit == "ETH" ? (
+                        <>
+                          <span style={{ fontFamily: "sans-serif" }}>
+                            {`\u039E`}
+                          </span>
+                          {widgetData.buyPrice}
+                        </>
+                      ) : (
+                        this.formatMoney(
+                          this.state.ETHprice * widgetData.buyPrice
+                        )
+                      )}
                       )
-                    </span>
+                    </div>
                   </h2>
 
                   <Description
@@ -546,12 +558,12 @@ class Widget extends React.Component {
                     </div>
                   </a>
                 </div>
-              </div>
-            </>
+              </div>{" "}
+            </div>
           )}
 
           {widgetData && size === "mini" && (
-            <>
+            <div className={styles.miniContainer}>
               <div className={styles.topContainer}>
                 <div className={styles.storeName}>
                   {`${widgetData.username}'s Store`}
@@ -703,22 +715,35 @@ class Widget extends React.Component {
                     className={styles.itemPrice}
                   >
                     <strong>
-                      {widgetData.currrencyUnit == "ETH"
-                        ? widgetData.buyPrice + " ETH"
-                        : this.formatMoney(
-                            this.state.ETHprice * widgetData.buyPrice
-                          )}
+                      {widgetData.currencyUnit == "ETH" ? (
+                        <>
+                          <span style={{ fontFamily: "sans-serif" }}>
+                            {`\u039E`}
+                          </span>
+                          {widgetData.buyPrice}
+                        </>
+                      ) : (
+                        this.formatMoney(
+                          this.state.ETHprice * widgetData.buyPrice
+                        )
+                      )}{" "}
                     </strong>
-                    <span>
-                      {" "}
-                      ({`\u039E`}
-                      {!widgetData.currrencyUnit == "ETH"
-                        ? widgetData.buyPrice + " ETH"
-                        : this.formatMoney(
-                            this.state.ETHprice * widgetData.buyPrice
-                          )}
+                    <div>
+                      (
+                      {!widgetData.currencyUnit == "ETH" ? (
+                        <>
+                          <span style={{ fontFamily: "sans-serif" }}>
+                            {`\u039E`}
+                          </span>
+                          {widgetData.buyPrice}
+                        </>
+                      ) : (
+                        this.formatMoney(
+                          this.state.ETHprice * widgetData.buyPrice
+                        )
+                      )}
                       )
-                    </span>
+                    </div>
                   </h2>
 
                   <a
@@ -735,11 +760,11 @@ class Widget extends React.Component {
                   </a>
                 </div>
               </div>
-            </>
+            </div>
           )}
 
-          {widgetData && size === "mobile" && (
-            <>
+          {widgetData && (
+            <div className={styles.mobileContainer}>
               <div
                 style={{ paddingTop: "16px" }}
                 className={styles.artistFlexContainer}
@@ -870,22 +895,35 @@ class Widget extends React.Component {
                     className={styles.itemPrice}
                   >
                     <strong>
-                      {widgetData.currrencyUnit == "ETH"
-                        ? widgetData.buyPrice + " ETH"
-                        : this.formatMoney(
-                            this.state.ETHprice * widgetData.buyPrice
-                          )}
+                      {widgetData.currencyUnit == "ETH" ? (
+                        <>
+                          <span style={{ fontFamily: "sans-serif" }}>
+                            {`\u039E`}
+                          </span>
+                          {widgetData.buyPrice}
+                        </>
+                      ) : (
+                        this.formatMoney(
+                          this.state.ETHprice * widgetData.buyPrice
+                        )
+                      )}{" "}
                     </strong>
-                    <span>
-                      {" "}
-                      ({`\u039E`}
-                      {!widgetData.currrencyUnit == "ETH"
-                        ? widgetData.buyPrice + " ETH"
-                        : this.formatMoney(
-                            this.state.ETHprice * widgetData.buyPrice
-                          )}
+                    <div>
+                      (
+                      {!widgetData.currencyUnit == "ETH" ? (
+                        <>
+                          <span style={{ fontFamily: "sans-serif" }}>
+                            {`\u039E`}
+                          </span>
+                          {widgetData.buyPrice}
+                        </>
+                      ) : (
+                        this.formatMoney(
+                          this.state.ETHprice * widgetData.buyPrice
+                        )
+                      )}
                       )
-                    </span>
+                    </div>
                   </h2>
 
                   <a
@@ -902,7 +940,7 @@ class Widget extends React.Component {
                   </a>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       );
@@ -1032,23 +1070,33 @@ class Widget extends React.Component {
                           className={styles.itemPrice}
                         >
                           <strong>
-                            {item.currrencyUnit == "ETH"
-                              ? item.buyPrice + " ETH"
-                              : this.formatMoney(
-                                  this.state.ETHprice * item.buyPrice
-                                )}
+                            {item.currencyUnit == "ETH" ? (
+                              <>
+                                <span style={{ fontFamily: "sans-serif" }}>
+                                  {`\u039E`}
+                                </span>
+                                {item.buyPrice}
+                              </>
+                            ) : (
+                              this.formatMoney(
+                                this.state.ETHprice * item.buyPrice
+                              )
+                            )}{" "}
                           </strong>
                           <div>
-                            {" "}
                             (
-                            <span
-                              style={{ fontFamily: "sans-serif" }}
-                            >{`\u039E`}</span>
-                            {!item.currrencyUnit == "ETH"
-                              ? item.buyPrice + " ETH"
-                              : this.formatMoney(
-                                  this.state.ETHprice * item.buyPrice
-                                )}
+                            {!item.currencyUnit == "ETH" ? (
+                              <>
+                                <span style={{ fontFamily: "sans-serif" }}>
+                                  {`\u039E`}
+                                </span>
+                                {item.buyPrice}
+                              </>
+                            ) : (
+                              this.formatMoney(
+                                this.state.ETHprice * item.buyPrice
+                              )
+                            )}
                             )
                           </div>
                         </h2>
