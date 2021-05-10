@@ -4,11 +4,16 @@ export const fetchById = async (id) => {
   try {
     let fetchResult = null;
     await fetch(ESSearch + id)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status > 200) {
+          throw `404: ${id} not available`;
+        }
+        return res.json();
+      })
       .then((data) => (fetchResult = data));
     return fetchResult._source.data;
   } catch (err) {
-    console.log(err);
+    console.warn(err);
   }
 };
 

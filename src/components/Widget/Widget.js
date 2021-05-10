@@ -39,6 +39,7 @@ class Widget extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       displayed: 8,
 
       ETHprice: null,
@@ -71,8 +72,11 @@ class Widget extends React.Component {
   }
 
   addCount() {
-    this.setState({
-      displayed: this.state.displayed + 1,
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        displayed: prevState.displayed + 1,
+      };
     });
   }
 
@@ -145,6 +149,13 @@ class Widget extends React.Component {
 
   async showWithId(params) {
     const item = await fetchById(params.ids[0]);
+    if (!item) {
+      this.setState({
+        error: "This listing is not available",
+      });
+      return;
+    }
+
     const SEO = this.getSEOstring(item.title, item.sub_title);
     const itemUrl = `https://mintable.app/${item.category}/item/${SEO}/${item.id}`;
     const userProfileUrl = `https://mintable.app/u/${item.owner}`;
@@ -183,12 +194,13 @@ class Widget extends React.Component {
   }
 
   async showWithIdArr(params) {
-    const items = await Promise.all(
+    let items = await Promise.all(
       params.ids.map(async (id) => {
         const item = await fetchById(id);
         return item;
       })
     );
+    items = items.filter((item) => item !== undefined);
     const widgetDataArr = [];
     for (let i = 0; i < items.length; i++) {
       const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
@@ -326,6 +338,8 @@ class Widget extends React.Component {
 
   render() {
     const {
+      error,
+
       backgroundColor,
       fontColor,
       subtitleFontColor,
@@ -353,6 +367,15 @@ class Widget extends React.Component {
           }
           className={styles.fontContainer}
         >
+          <div
+            style={{
+              textAlign: "center",
+              fontSize: "24px",
+              marginTop: "24px",
+            }}
+          >
+            {error}
+          </div>
           {widgetData && size !== "mini" && (
             <div className={styles.normalContainer}>
               <div className={styles.topContainer}>

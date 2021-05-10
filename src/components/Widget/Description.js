@@ -76,7 +76,12 @@ class Description extends React.Component {
   render() {
     const { fontColor, buttonColor } = this.props;
     return (
-      <>
+      <div
+        style={{
+          overflow: "auto",
+          height: "250px",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -105,7 +110,7 @@ class Description extends React.Component {
           className={styles.description}
           dangerouslySetInnerHTML={this.getIframelyHtml()}
         />
-      </>
+      </div>
     );
   }
 }
