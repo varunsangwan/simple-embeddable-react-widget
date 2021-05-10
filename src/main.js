@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Widget from "./components/Widget/Widget";
+import Widget from "./components/Widget";
 
 const widgetName = "Mintable_Widget";
 const widgetConfigName = widgetName + "Config";
@@ -16,26 +16,20 @@ function app(window) {
   // so we need to get our data out of that tag
   if (!window[widgetName]) {
     let tag = document.getElementById(widgetName + "-Script");
-
     if (!tag) {
       throw Error(`Cannot find script tag with id {$widgetName}-Script`);
     }
-
     let rawData = tag.getAttribute("data-config");
     rawData = rawData.replace(/'/g, '"');
     // console.log(rawData);
     let data = JSON.parse(rawData);
-
     window[widgetName] = data.name;
-
     let placeholder = {};
     (placeholder.q = []).push(["init", data.config]);
-
     window[window[widgetName]] = placeholder;
   }
 
   let placeholder = window[window[widgetName]];
-
   // override temporary (until the app loaded) handler
   // for widget's API calls
   window[window[widgetName]] = apiHandler;
@@ -43,11 +37,9 @@ function app(window) {
 
   if (placeholder) {
     // console.log(`${widgetName} placeholder found`);
-
     let queue = placeholder.q;
     if (queue) {
       // console.log(`${widgetName} placeholder queue found`);
-
       for (var i = 0; i < queue.length; i++) {
         apiHandler(queue[i][0], queue[i][1]);
       }
@@ -62,7 +54,6 @@ function apiHandler(api, params) {
   if (!api) throw Error("API method required");
   api = api.toLowerCase();
   let config = window[widgetConfigName];
-
   // console.log(`Handling API call ${api}`, params, config);
 
   switch (api) {

@@ -1,7 +1,7 @@
 import React from "react";
 import sanitizeHtml from "sanitize-html";
-import { SANITIZER_CONFIG } from "../../config";
-import { getRequestWithoutAuth } from "../../utils/api";
+import { SANITIZER_CONFIG } from "../config";
+import { getRequestWithoutAuth } from "../utils/api";
 import styles from "./widget.module.css";
 
 class Description extends React.Component {

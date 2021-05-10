@@ -1,16 +1,16 @@
 import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import { PROFILE_S3_BUCKET, userProfile } from "../../config";
-import { fetchById } from "../../fetchItemId/fetchItemId";
-import { fetchByUsername } from "../../fetchItemUsername/fetchItemUsername";
-import { fetchByStoreId } from "../../fetchStoreItems/fetchStoreItems";
-import { getRequestWithoutAuth } from "../../utils/api";
-import { checkIfVideoExtension } from "../../utils/checkIfVideoExtension";
-import { getETHPrice } from "../../utils/pricefeed";
-import SocialSharing from "../SocialSharing";
+import { PROFILE_S3_BUCKET, userProfile } from "../config";
+import { fetchById } from "../fetchItemId/fetchItemId";
+import { fetchByUsername } from "../fetchItemUsername/fetchItemUsername";
+import { fetchByStoreId } from "../fetchStoreItems/fetchStoreItems";
+import { getRequestWithoutAuth } from "../utils/api";
+import { checkIfVideoExtension } from "../utils/checkIfVideoExtension";
+import { getETHPrice } from "../utils/pricefeed";
 import CarouselCard from "./CarouselCard";
 import Description from "./Description";
+import SocialSharing from "./SocialSharing";
 import styles from "./widget.module.css";
 
 const INITIAL_LOAD = 8;
@@ -49,7 +49,7 @@ class Widget extends React.Component {
 
       backgroundColor: null,
       fontColor: null,
-      subtitleFontColor: null,
+      subtitleColor: null,
       boxShadow: null,
       fontFamily: null,
       buttonColor: null,
@@ -183,7 +183,7 @@ class Widget extends React.Component {
     this.setState({
       backgroundColor: params.backgroundColor,
       fontColor: params.fontColor,
-      subtitleFontColor: params.subtitleFontColor,
+      subtitleColor: params.subtitleColor,
       boxShadow: params.boxShadow,
       fontFamily: params.fontFamily,
       buttonColor: params.buttonColor,
@@ -236,7 +236,7 @@ class Widget extends React.Component {
     this.setState({
       backgroundColor: params.backgroundColor,
       fontColor: params.fontColor,
-      subtitleFontColor: params.subtitleFontColor,
+      subtitleColor: params.subtitleColor,
       boxShadow: params.boxShadow,
       fontFamily: params.fontFamily,
       buttonColor: params.buttonColor,
@@ -308,7 +308,7 @@ class Widget extends React.Component {
     this.setState({
       backgroundColor: params.backgroundColor,
       fontColor: params.fontColor,
-      subtitleFontColor: params.subtitleFontColor,
+      subtitleColor: params.subtitleColor,
       boxShadow: params.boxShadow,
       fontFamily: params.fontFamily,
       buttonColor: params.buttonColor,
@@ -342,7 +342,7 @@ class Widget extends React.Component {
 
       backgroundColor,
       fontColor,
-      subtitleFontColor,
+      subtitleColor,
       boxShadow,
       fontFamily,
       buttonColor,
@@ -483,7 +483,7 @@ class Widget extends React.Component {
                       <div
                         style={
                           {
-                            color: subtitleFontColor,
+                            color: subtitleColor,
                           } || null
                         }
                         className={styles.artistLabel}
@@ -496,7 +496,7 @@ class Widget extends React.Component {
                   <div
                     style={
                       {
-                        color: subtitleFontColor,
+                        color: subtitleColor,
                       } || null
                     }
                     className={styles.itemType}
@@ -697,7 +697,7 @@ class Widget extends React.Component {
                       <div
                         style={
                           {
-                            color: subtitleFontColor,
+                            color: subtitleColor,
                           } || null
                         }
                         className={styles.artistLabel}
@@ -710,7 +710,7 @@ class Widget extends React.Component {
                   <div
                     style={
                       {
-                        color: subtitleFontColor,
+                        color: subtitleColor,
                       } || null
                     }
                     className={styles.itemType}
@@ -891,7 +891,7 @@ class Widget extends React.Component {
                   <div
                     style={
                       {
-                        color: subtitleFontColor,
+                        color: subtitleColor,
                       } || null
                     }
                     className={styles.mobileItemType}
@@ -1066,7 +1066,7 @@ class Widget extends React.Component {
                         <div
                           style={
                             {
-                              color: subtitleFontColor,
+                              color: subtitleColor,
                             } || null
                           }
                           className={styles.gridSubtitle}
@@ -1126,7 +1126,7 @@ class Widget extends React.Component {
                         <div
                           style={
                             {
-                              color: subtitleFontColor,
+                              color: subtitleColor,
                             } || null
                           }
                           className={styles.gridSubtitle}
@@ -1183,7 +1183,7 @@ class Widget extends React.Component {
                         customStyles={{
                           backgroundColor,
                           fontColor,
-                          subtitleFontColor,
+                          subtitleColor,
                           buttonColor,
                           buttonTextColor,
                         }}

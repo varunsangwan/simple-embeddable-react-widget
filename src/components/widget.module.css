@@ -213,6 +213,7 @@
   height: 420px;
   min-width: 250px;
   max-width: 350px;
+  margin: auto;
 }
 
 .gridItemcardImage {

@@ -1,6 +1,6 @@
 import React from "react";
 import LazyLoad from "react-lazy-load";
-import { checkIfVideoExtension } from "../../utils/checkIfVideoExtension";
+import { checkIfVideoExtension } from "../utils/checkIfVideoExtension";
 import styles from "./widget.module.css";
 
 export default class CarouselCard extends React.Component {
@@ -14,7 +14,7 @@ export default class CarouselCard extends React.Component {
     const {
       backgroundColor,
       fontColor,
-      subtitleFontColor,
+      subtitleColor,
       buttonColor,
       buttonTextColor,
     } = customStyles;
@@ -89,7 +89,7 @@ export default class CarouselCard extends React.Component {
           <div
             style={
               {
-                color: subtitleFontColor,
+                color: subtitleColor,
               } || null
             }
             className={styles.gridSubtitle}
@@ -141,7 +141,7 @@ export default class CarouselCard extends React.Component {
           <div
             style={
               {
-                color: subtitleFontColor,
+                color: subtitleColor,
               } || null
             }
             className={styles.gridSubtitle}
