@@ -79,7 +79,7 @@ class Description extends React.Component {
       <div
         style={{
           overflow: "auto",
-          height: "250px",
+          height: "230px",
         }}
       >
         <div
