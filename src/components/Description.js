@@ -73,6 +73,13 @@ class Description extends React.Component {
     this.ParseHTML(this.props.descriptionData);
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.descriptionData !== this.props.descriptionData) {
+      window.iframely && iframely.load();
+      this.ParseHTML(this.props.descriptionData);
+    }
+  }
+
   render() {
     const { fontColor, buttonColor } = this.props;
     return (

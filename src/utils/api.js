@@ -20,8 +20,8 @@ export async function getRequestWithoutAuth(url) {
   if (res.status >= 200 && res.status < 400) {
     return res.json();
   } else {
-    const res = await res.json();
-    throw res.error;
+    const data = await res.json();
+    throw data.error;
   }
 }
 

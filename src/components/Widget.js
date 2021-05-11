@@ -19,11 +19,11 @@ const STEP_SIZE = 8;
 const responsive = {
   superLargeDesktop: {
     breakpoint: { max: 4000, min: 3000 },
-    items: 6,
+    items: 3,
   },
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 4,
+    items: 2,
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
@@ -91,7 +91,7 @@ class Widget extends React.Component {
   loadMore() {
     const { type, rawItems, lastKey, maxKey } = this.state;
     if ((type === "username" || type === "storeId") && maxKey > lastKey) {
-      this.loadItems(rawItems.slice(lastKey, lastKey + STEP_SIZE));
+      this.loadItems(rawItems.slice(0, lastKey + STEP_SIZE));
       this.setState({
         lastKey: lastKey + STEP_SIZE,
       });
@@ -206,10 +206,8 @@ class Widget extends React.Component {
       const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
       const itemUrl = `https://mintable.app/${items[i].category}/item/${SEO}/${items[i].id}`;
       const userProfileUrl = `https://mintable.app/u/${items[i].owner}`;
-      const {
-        profileImg,
-        socialMedia,
-      } = await this.getProfileImgAndSocialMedia(items[i].owner);
+      const { profileImg, socialMedia } =
+        await this.getProfileImgAndSocialMedia(items[i].owner);
 
       const widgetData = {
         image: items[i].preview_images[0],
@@ -247,16 +245,12 @@ class Widget extends React.Component {
   }
 
   async loadItems(items) {
-    const widgetDataArr = [...this.state.widgetDataArr];
+    const widgetDataArr = [];
     for (let i = 0; i < items.length; i++) {
       const SEO = this.getSEOstring(items[i].title, items[i].sub_title);
       const itemUrl = `https://mintable.app/${items[i].category}/item/${SEO}/${items[i].id}`;
       const userProfileUrl = `https://mintable.app/u/${items[i].owner}`;
-      const {
-        profileImg,
-        socialMedia,
-      } = await this.getProfileImgAndSocialMedia(items[i].owner);
-      const widgetData = {
+      let widgetData = {
         image: items[i].preview_images[0],
         username: items[i].owner,
         storeId: items[i].store_id,
@@ -272,9 +266,13 @@ class Widget extends React.Component {
         currencyUnit: items[i].currency,
         itemUrl,
         userProfileUrl,
-        profileImg,
-        socialMedia,
       };
+      if (i === 0) {
+        const { profileImg, socialMedia } =
+          await this.getProfileImgAndSocialMedia(items[i].owner);
+        widgetData[profileImg] = profileImg;
+        widgetData[socialMedia] = socialMedia;
+      }
       widgetDataArr.push(widgetData);
     }
     this.setState({
@@ -524,7 +522,7 @@ class Widget extends React.Component {
                     className={styles.itemPrice}
                   >
                     <strong>
-                      {widgetData.currencyUnit == "ETH" ? (
+                      {widgetData.currencyUnit === "ETH" ? (
                         <>
                           <span style={{ fontFamily: "sans-serif" }}>
                             {`\u039E`}
@@ -539,7 +537,7 @@ class Widget extends React.Component {
                     </strong>
                     <div>
                       (
-                      {!widgetData.currencyUnit == "ETH" ? (
+                      {!widgetData.currencyUnit === "ETH" ? (
                         <>
                           <span style={{ fontFamily: "sans-serif" }}>
                             {`\u039E`}
@@ -738,7 +736,7 @@ class Widget extends React.Component {
                     className={styles.itemPrice}
                   >
                     <strong>
-                      {widgetData.currencyUnit == "ETH" ? (
+                      {widgetData.currencyUnit === "ETH" ? (
                         <>
                           <span style={{ fontFamily: "sans-serif" }}>
                             {`\u039E`}
@@ -753,7 +751,7 @@ class Widget extends React.Component {
                     </strong>
                     <div>
                       (
-                      {!widgetData.currencyUnit == "ETH" ? (
+                      {!widgetData.currencyUnit === "ETH" ? (
                         <>
                           <span style={{ fontFamily: "sans-serif" }}>
                             {`\u039E`}
@@ -918,7 +916,7 @@ class Widget extends React.Component {
                     className={styles.itemPrice}
                   >
                     <strong>
-                      {widgetData.currencyUnit == "ETH" ? (
+                      {widgetData.currencyUnit === "ETH" ? (
                         <>
                           <span style={{ fontFamily: "sans-serif" }}>
                             {`\u039E`}
@@ -933,7 +931,7 @@ class Widget extends React.Component {
                     </strong>
                     <div>
                       (
-                      {!widgetData.currencyUnit == "ETH" ? (
+                      {!widgetData.currencyUnit === "ETH" ? (
                         <>
                           <span style={{ fontFamily: "sans-serif" }}>
                             {`\u039E`}
@@ -1093,7 +1091,7 @@ class Widget extends React.Component {
                           className={styles.itemPrice}
                         >
                           <strong>
-                            {item.currencyUnit == "ETH" ? (
+                            {item.currencyUnit === "ETH" ? (
                               <>
                                 <span style={{ fontFamily: "sans-serif" }}>
                                   {`\u039E`}
@@ -1108,7 +1106,7 @@ class Widget extends React.Component {
                           </strong>
                           <div>
                             (
-                            {!item.currencyUnit == "ETH" ? (
+                            {!item.currencyUnit === "ETH" ? (
                               <>
                                 <span style={{ fontFamily: "sans-serif" }}>
                                   {`\u039E`}

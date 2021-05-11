@@ -25,9 +25,10 @@
 }
 
 .mobileCard {
-  margin-top: 16px;
   min-width: 250px;
   max-width: 350px;
+  margin: auto;
+  margin-top: 16px;
 }
 
 .cardImage {
