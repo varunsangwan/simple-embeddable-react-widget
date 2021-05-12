@@ -1,13 +1,89 @@
 <html>
+  <head>
+    <title>Demo page of the widget</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
 
-<head>
-    <title>Simple Embeddable React Widget</title>
-</head>
+  <body>
+    <div id="root">Loading...</div>
+    <script>
+      (function (w, d, s, o, f, js, fjs) {
+        w["Mintable_Widget"] = o;
+        w[o] =
+          w[o] ||
+          function () {
+            (w[o].q = w[o].q || []).push(arguments);
+          };
+        (js = d.createElement(s)), (fjs = d.getElementsByTagName(s)[0]);
+        js.id = o;
+        js.src = f;
+        js.async = 1;
+        fjs.parentNode.insertBefore(js, fjs);
+      })(window, document, "script", "w1", "./widget.js");
+      w1("init", { targetElementId: "root" });
+      // one item id
+      // w1("shownft", {
+      //   ids: ["collectibles/listing/1FCt9MCBTAfIpfA"],
+      //   backgroundColor: "white",
+      //   fontColor: "#2d2d2d",
+      //   subtitleColor: "#727272",
+      //   boxShadow: true,
+      //   fontFamily: "Lato",
+      //   buttonColor: "#550ded",
+      //   buttonTextColor: "white",
 
-<body>
-    <h1>Simple Embeddable React Widget</h1>
-    <p>Demo #1: <a href="demo_sync.html">synchronous loading</a></p>
-    <p>Demo #2: <a href="demo_async.html">asynchronous loading</a></p>
-</body>
+      //   // size: "mini",
+      // });
 
+      // many item id
+      // w1("shownft", {
+      //   ids: [
+      //     "videos/listing/AkbbGXn5EtMr-Yv",
+      //     "art/listing/w1ZkGpAfJebod0P",
+      //     "videos/listing/AkbbGXn5EtMr-Yv",
+      //     "videos/listing/AkbbGXn5EtMr-Yv",
+      //     // "collectibles/listing/1FCt9MCBTAfIpfA",
+      //   ],
+      //   backgroundColor: "white",
+      //   fontColor: "#2d2d2d",
+      //   subtitleColor: "##727272",
+      //   boxShadow: true,
+      //   fontFamily: "Lato",
+      //   buttonColor: "#550ded",
+      //   buttonTextColor: "white",
+      // });
+
+      // user name - unused
+      // w1("shownft", {
+      //   username: "spader",
+      //   backgroundColor: "white",
+      //   fontColor: "#2d2d2d",
+      //   subtitleColor: "##727272",
+      //   boxShadow: true,
+      //   fontFamily: "Lato",
+      //   buttonColor: "#550ded",
+      //   buttonTextColor: "white",
+
+      //   size: "mini",
+      // });
+
+      // store id
+      w1("shownft", {
+        storeId: "dd6f8260-2215-45fd-960e-e205b8680126",
+        backgroundColor: "white",
+        fontColor: "#2d2d2d",
+        subtitleColor: "##727272",
+        boxShadow: true,
+        fontFamily: "Lato",
+        buttonColor: "#550ded",
+        buttonTextColor: "white",
+
+        size: "mini",
+      });
+    </script>
+
+    <!-- <div>
+      <button onclick="w1('message', 'Hello world!');">Send Message</button>
+    </div> -->
+  </body>
 </html>
