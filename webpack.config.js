@@ -11,7 +11,8 @@ module.exports = (env) => {
       entry: ["@babel/polyfill", "./src/main.js"],
       mode: "production",
       output: {
-        filename: "widget.js",
+        //filename: "widget.js",
+        filename: "index.js",
         path: path.resolve(bundleOutputDir),
       },
       module: {
@@ -51,11 +52,12 @@ module.exports = (env) => {
         port: 3000,
         contentBase: bundleOutputDir,
       },
-      plugins: [
-        new copyWebpackPlugin({
-          patterns: [{ from: "demo/", to: "index.html" }],
-        }),
-      ],
+      //remove
+      // plugins: [
+      //   new copyWebpackPlugin({
+      //     patterns: [{ from: "demo/", to: "index.html" }],
+      //   }),
+      // ],
     },
   ];
 };
