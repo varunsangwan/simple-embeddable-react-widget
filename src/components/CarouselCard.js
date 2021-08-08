@@ -157,6 +157,8 @@ export default class CarouselCard extends React.Component {
             }
             className={styles.buyNowSingle}
             href={item.itemUrl}
+            rel="noreferrer noopener"
+            target="_blank"
           >
             <div
               style={

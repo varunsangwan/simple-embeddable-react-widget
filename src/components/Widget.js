@@ -567,6 +567,8 @@ class Widget extends React.Component {
                     }
                     className={styles.buyNow}
                     href={widgetData.itemUrl}
+                    rel="noreferrer noopener"
+                    target="_blank"
                   >
                     <div
                       style={
@@ -776,6 +778,8 @@ class Widget extends React.Component {
                     }
                     className={styles.miniBuyNow}
                     href={widgetData.itemUrl}
+                    rel="noreferrer noopener"
+                    target="_blank"
                   >
                     Buy Now
                   </a>
@@ -956,6 +960,8 @@ class Widget extends React.Component {
                     }
                     className={styles.mobileBuyNow}
                     href={widgetData.itemUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
                   >
                     Buy Now
                   </a>
@@ -1140,6 +1146,8 @@ class Widget extends React.Component {
                           }
                           className={styles.buyNowSingle}
                           href={item.itemUrl}
+                          rel="noreferrer noopener"
+                          target="_blank"
                         >
                           <div
                             style={
