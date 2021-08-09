@@ -11,8 +11,8 @@ module.exports = (env) => {
       entry: ["@babel/polyfill", "./src/main.js"],
       mode: "production",
       output: {
-        //filename: "widget.js",
-        filename: "index.js",
+        filename: "widget.js",
+        //filename: "index.js",
         path: path.resolve(bundleOutputDir),
       },
       module: {
